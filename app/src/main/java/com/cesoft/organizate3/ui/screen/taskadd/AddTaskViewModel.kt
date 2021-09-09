@@ -2,27 +2,30 @@ package com.cesoft.organizate3.ui.screen.taskadd
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.cesoft.organizate3.data.Repository
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
 import com.google.android.libraries.maps.model.LatLng
+import com.google.android.libraries.maps.model.Marker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.*
 
 class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
-    enum class Field { Name, Description, DueDate, Done, Type, LatLon }//Priority,
+    enum class Field {
+        Name, Description, DueDate, Done, Type,
+        LatLon, Zoom, Marker, MapState
+    }//Priority,
     sealed class Intent {
         object Save : Intent()
-        data class ChangeField(val field: Field, val value: Any) : Intent()
+        data class ChangeField(val field: Field, val value: Any?) : Intent()
     }
 
     private val repo = Repository(app.applicationContext)
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
-
-    //private val _task = MutableStateFlow(Task(0,""))
-    //val task: StateFlow<Task> = _task
 
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
@@ -34,15 +37,36 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     val done: StateFlow<Boolean> = _done
     private val _dueDate = MutableStateFlow(Date())
     val dueDate: StateFlow<Date> = _dueDate
+
+    //TODO: make a ViewModel just for the MapCompo with this kind of shit ?
     private val _latLng = MutableStateFlow(LatLng(0.0, 0.0))
     val latLng: StateFlow<LatLng> = _latLng
+    private val _zoom = MutableStateFlow(8f)
+    val zoom: StateFlow<Float> = _zoom
+    private val _marker = MutableStateFlow<Marker?>(null)
+    val marker: StateFlow<Marker?> = _marker
+    //TEST
+    data class MapState(var latLng: LatLng, var zoom: Float, var marker: Marker?)
+    val mapState = MapState(LatLng(0.0, 0.0), 8f, null)
 
-    var priority = MutableStateFlow(Task.Priority.LOW)//TODO
+    private val _suggestion = MutableStateFlow<List<String>>(listOf())
+    val suggestions: StateFlow<List<String>> = _suggestion
+
+    //TODO
+    var priority = MutableStateFlow(Task.Priority.LOW)
     var radius: Int=0
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _suggestion.value= repo.getTaskTypes()
+        }
+    }
 
     suspend fun sendIntent(intent: Intent) {
         when(intent) {
             is Intent.ChangeField -> {
+                android.util.Log.e("AddTaskView", "sendIntent---$intent--------***------${intent.field}")
+
                 when(intent.field) {
                     Field.Name -> _name.value = intent.value as String
                     Field.Description -> _description.value = intent.value as String
@@ -50,6 +74,8 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
                     Field.Done -> _done.value = intent.value as Boolean
                     Field.DueDate -> _dueDate.value = intent.value as Date
                     Field.LatLon -> _latLng.value = intent.value as LatLng
+                    Field.Zoom -> _zoom.value = intent.value as Float
+                    Field.Marker -> _marker.value = intent.value as Marker?
                 }
             }
             is Intent.Save -> {

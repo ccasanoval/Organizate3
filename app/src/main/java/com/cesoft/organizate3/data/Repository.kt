@@ -29,4 +29,9 @@ class Repository(applicationContext: Context): TaskRepository {
         val dao = db.taskDao()
         dao.insert(task.toDb())
     }
+
+    override suspend fun getTaskTypes(): List<String> {
+        val dao = db.taskDao()
+        return dao.getTaskTypes()
+    }
 }

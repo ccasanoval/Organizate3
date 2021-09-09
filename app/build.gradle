@@ -4,6 +4,13 @@ plugins {
     id 'kotlin-kapt'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def mapsApiKey = properties.getProperty('mapsApiKey')
+project.logger.lifecycle("------------------------------------------------------------------------")
+project.logger.lifecycle("----- mapsApiKey = $mapsApiKey")
+project.logger.lifecycle("------------------------------------------------------------------------")
+
 android {
     compileSdk 31
 
@@ -19,7 +26,7 @@ android {
             useSupportLibrary true
         }
 
-        manifestPlaceholders = [mapsApiKey: "$System.env.MAPS_API_KEY"]
+        manifestPlaceholders = [mapsApiKey: mapsApiKey]
     }
 
     buildTypes {
@@ -41,7 +48,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion kotlin_version
     }
     packagingOptions {
         resources {

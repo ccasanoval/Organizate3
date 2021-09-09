@@ -28,9 +28,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-//TODO: cuando pierde el foco se vuelve a llamar , da problemas porque se olvida de zoom etc ¿?
 @Composable
-fun MapCompo(value: LatLng, zoom: Float=8f, onValueChange: (LatLng) -> Unit) {
+fun MapCompo(
+    value: LatLng,
+    zoom: Float=8f,
+    marker: Marker?=null,
+    onValueChange: (LatLng, Float, Marker?) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -38,30 +42,35 @@ fun MapCompo(value: LatLng, zoom: Float=8f, onValueChange: (LatLng) -> Unit) {
             .padding(top = 8.dp)
             .size(400.dp)
     ) {
-        android.util.Log.e("MapCompo", "--------------------------------------------- $value")
-        val rememberMapView = rememberMapView()
-        var rememberMarker: Marker? = remember { null }
-        var rememberZoom: Float = remember { zoom }
+        android.util.Log.e("MapCompo", "--------------------------------------------0- $value / $zoom / $marker ")
         val markerTitle = stringResource(R.string.new_task)
+        val rememberMapView = rememberMapView()
+
         AndroidView({ rememberMapView }) { mapView ->
             CoroutineScope(Dispatchers.Main).launch {
                 val map = mapView.awaitMap()
                 map.uiSettings.isZoomControlsEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = true
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(value, rememberZoom))
-                map.setOnCameraMoveListener {
-                    rememberZoom = map.cameraPosition.zoom
-                    //onZoomChange(map.cameraPosition.zoom)
-                }
-                map.setOnMapClickListener { latLng: LatLng ->
-                    onValueChange(latLng)
-                    //
-                    map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                    val markerOptions = MarkerOptions()
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(value, zoom))
+                //map.setOnCameraMoveListener {
+                //    onValueChange(map.cameraPosition.target, map.cameraPosition.zoom, rememberMarker)
+                //}
+
+                marker?.remove()
+                var newMarker = map.addMarker(
+                    MarkerOptions()
                         .title(markerTitle)
-                        .position(latLng)
-                    rememberMarker?.remove()
-                    rememberMarker = map.addMarker(markerOptions)
+                        .position(value))
+
+                map.setOnMapClickListener { latLng: LatLng ->
+                    map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                    newMarker?.remove()
+                    newMarker = map.addMarker(
+                        MarkerOptions()
+                            .title(markerTitle)
+                            .position(latLng))
+                    //
+                    onValueChange(latLng, map.cameraPosition.zoom, newMarker)
                 }
             }
         }

@@ -40,10 +40,13 @@ import java.util.Date
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Intent
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Field
 import com.google.android.libraries.maps.model.LatLng
+import com.google.android.libraries.maps.model.Marker
 
 
 @Composable
 fun AddTaskScreen(navController: NavHostController) {
+    android.util.Log.e("AddTaskScreen", "AddTaskScreen----------------------0")
+
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { MainBottomNavigation(navController) }
@@ -84,6 +87,8 @@ private fun TopBar() {
 @Preview
 @Composable
 private fun Body() {
+    android.util.Log.e("AddTaskScreen", "Body----------------------0")
+
     val viewModel: AddTaskViewModel = viewModel()
     val name: String by viewModel.name.collectAsState()
     val description: String by viewModel.description.collectAsState()
@@ -91,13 +96,16 @@ private fun Body() {
     val dueDate: Date by viewModel.dueDate.collectAsState()
     val done: Boolean by viewModel.done.collectAsState()
     val latLng: LatLng by viewModel.latLng.collectAsState()
+    val zoom: Float by viewModel.zoom.collectAsState()
+    val marker: Marker? by viewModel.marker.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
-    val changeField : (field: Field, value: Any) -> Unit = { field, value ->
+    val changeField : (field: Field, value: Any?) -> Unit = { field, value ->
         coroutineScope.launch {
             viewModel.sendIntent(Intent.ChangeField(field, value))
         }
     }
+    val suggestions = viewModel.suggestions.collectAsState()
 
     Column(
         Modifier
@@ -114,7 +122,7 @@ private fun Body() {
         }
         // Type
         TextFieldAutoCompo(
-            type, R.string.field_type, listOf("Default", "Shopping list", "Learn") //TODO:from db
+            type, R.string.field_type, suggestions.value
         ) {
             changeField(Field.Type, it)
         }
@@ -124,14 +132,16 @@ private fun Body() {
             android.util.Log.e("AddTaskScreen", "Body----------------------date=$it")
         }
         // Done
-        CheckboxCompo(done) {
+        CheckboxCompo(done, R.string.field_done) {
             changeField(Field.Done, it)
         }
         //TODO: priority
         //TODO: Radius
         // Map
-        MapCompo(latLng) {
-            changeField(Field.LatLon, it)
+        MapCompo(latLng, zoom, marker) { latLng, zoom, marker ->
+            changeField(Field.LatLon, latLng)
+            changeField(Field.Zoom, zoom)
+            changeField(Field.Marker, marker)
         }
         // Spacer: bottom toolbar height so it doesnt hide map
         Column {

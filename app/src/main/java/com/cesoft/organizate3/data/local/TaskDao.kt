@@ -18,6 +18,9 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE name LIKE :name LIMIT 1")
     fun getByName(name: String): TaskEntity
 
+    @Query("SELECT DISTINCT(type) FROM tasks")
+    fun getTaskTypes(): List<String>
+
     /// INSERT ----------------------------------------------------------------
     @Insert
     fun insertAll(vararg tasks: TaskEntity)
