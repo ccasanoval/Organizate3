@@ -1,5 +1,6 @@
-package com.cesoft.organizate3.ui.screen
+package com.cesoft.organizate3.ui.screen.taskdetail
 
+import android.os.Bundle
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -12,14 +13,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import com.cesoft.organizate3.R
+import com.cesoft.organizate3.ui.navigation.TASK_ID
+import com.cesoft.organizate3.ui.navigation.TASK_NAME
 
 @Composable
 fun TaskDetailScreen(
-    id: String,
-    name: String,
+    args: Bundle?,
     popBack: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
+
+    val id = args?.getInt(TASK_ID) ?: 0
+    val name = args?.getString(TASK_NAME) ?: "?"
 
     LaunchedEffect(id) {
         //viewModel.setTask(id)

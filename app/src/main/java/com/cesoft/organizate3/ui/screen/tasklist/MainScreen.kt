@@ -23,19 +23,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.navigation.Screens
-import com.cesoft.organizate3.ui.navigation.getStringArg
+import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
-import com.cesoft.organizate3.ui.screen.TaskDetailScreen
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskScreen
-
-private const val TASK_ID = "TASK_ID"
-private const val TASK_NAME = "TASK_NAME"
+import com.cesoft.organizate3.ui.screen.taskdetail.TaskDetailScreen
 
 @Composable
 fun MainScreen() {
@@ -51,7 +47,9 @@ fun MainScreen() {
         navController = navController,
         startDestination = Screens.TasksScreen.route
     ) {
-        composable(Screens.TasksScreen.route) {
+        composable(
+            route = Screens.TasksScreen.route
+        ) {
             Scaffold(
                 topBar = topBar,
                 bottomBar = bottomBar
@@ -60,21 +58,17 @@ fun MainScreen() {
             }
         }
         composable(
-            route = Screens.TaskDetailScreen.route + "?$TASK_ID={id}&$TASK_NAME={name}",
-            arguments = listOf(
-                navArgument(TASK_ID) { nullable = true },
-                navArgument(TASK_NAME) { nullable = true }
-            ),
+            route = Screens.AddTaskScreen.route,
         ) {
-            TaskDetailScreen(
-                id = it.getStringArg("id"),
-                name = it.getStringArg("name"),
-            ) {
+            AddTaskScreen(navController)
+        }
+        composable(
+            route = Screens.TaskDetailScreen.route + Screens.TaskDetailScreen.argsDef,
+            arguments = Screens.TaskDetailScreen.args,
+        ) {
+            TaskDetailScreen(it.arguments) {
                 navController.popBackStack()
             }
-        }
-        composable(Screens.AddTaskScreen.route) {
-            AddTaskScreen(navController)
         }
     }
 }
@@ -83,12 +77,7 @@ fun MainScreen() {
 fun TasksView(viewModel: MainViewModel, navController: NavHostController) {
     TasksList(viewModel) { task ->
         navController.navigate(
-            Screens.TaskDetailScreen.withArgs(
-                args = mapOf(
-                    TASK_ID to task.id.toString(),
-                    TASK_NAME to task.name,
-                )
-            )
+            Screens.TaskDetailScreen.withArgs(task)
         )
     }
 }
