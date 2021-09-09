@@ -40,7 +40,6 @@ import java.util.Date
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Intent
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Field
 import com.google.android.libraries.maps.model.LatLng
-import com.google.android.libraries.maps.model.Marker
 
 
 @Composable
@@ -96,8 +95,8 @@ private fun Body() {
     val dueDate: Date by viewModel.dueDate.collectAsState()
     val done: Boolean by viewModel.done.collectAsState()
     val latLng: LatLng by viewModel.latLng.collectAsState()
-    val zoom: Float by viewModel.zoom.collectAsState()
-    val marker: Marker? by viewModel.marker.collectAsState()
+    //val zoom: Float by viewModel.zoom.collectAsState()
+    //val marker: Marker? by viewModel.marker.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
     val changeField : (field: Field, value: Any?) -> Unit = { field, value ->
@@ -138,10 +137,8 @@ private fun Body() {
         //TODO: priority
         //TODO: Radius
         // Map
-        MapCompo(latLng, zoom, marker) { latLng, zoom, marker ->
+        MapCompo(latLng, viewModel.mapState) { latLng ->
             changeField(Field.LatLon, latLng)
-            changeField(Field.Zoom, zoom)
-            changeField(Field.Marker, marker)
         }
         // Spacer: bottom toolbar height so it doesnt hide map
         Column {

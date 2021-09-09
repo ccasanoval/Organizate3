@@ -18,10 +18,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.cesoft.organizate3.R
+import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
-import com.google.android.libraries.maps.model.Marker
 import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.CoroutineScope
@@ -31,9 +31,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapCompo(
     value: LatLng,
-    zoom: Float=8f,
-    marker: Marker?=null,
-    onValueChange: (LatLng, Float, Marker?) -> Unit
+    mapState: AddTaskViewModel.MapState,
+    onValueChange: (LatLng) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -42,7 +41,7 @@ fun MapCompo(
             .padding(top = 8.dp)
             .size(400.dp)
     ) {
-        android.util.Log.e("MapCompo", "--------------------------------------------0- $value / $zoom / $marker ")
+        android.util.Log.e("MapCompo", "--------------------------------------------0- $value / $mapState : ${mapState.zoom} / ${mapState.marker} ")
         val markerTitle = stringResource(R.string.new_task)
         val rememberMapView = rememberMapView()
 
@@ -51,26 +50,27 @@ fun MapCompo(
                 val map = mapView.awaitMap()
                 map.uiSettings.isZoomControlsEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = true
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(value, zoom))
-                //map.setOnCameraMoveListener {
-                //    onValueChange(map.cameraPosition.target, map.cameraPosition.zoom, rememberMarker)
-                //}
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(value, mapState.zoom))
+                map.setOnCameraMoveListener {
+                    mapState.latLng = map.cameraPosition.target
+                    mapState.zoom = map.cameraPosition.zoom
+                }
 
-                marker?.remove()
-                var newMarker = map.addMarker(
+                mapState.marker?.remove()
+                mapState.marker = map.addMarker(
                     MarkerOptions()
                         .title(markerTitle)
                         .position(value))
 
                 map.setOnMapClickListener { latLng: LatLng ->
                     map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                    newMarker?.remove()
-                    newMarker = map.addMarker(
+                    mapState.marker?.remove()
+                    mapState.marker = map.addMarker(
                         MarkerOptions()
                             .title(markerTitle)
                             .position(latLng))
                     //
-                    onValueChange(latLng, map.cameraPosition.zoom, newMarker)
+                    onValueChange(latLng)
                 }
             }
         }
