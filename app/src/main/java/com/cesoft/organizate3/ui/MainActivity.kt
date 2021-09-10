@@ -3,6 +3,7 @@ package com.cesoft.organizate3.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import com.cesoft.organizate3.ui.screen.tasklist.MainScreen
 import com.cesoft.organizate3.ui.theme.Organizate3Theme
 
@@ -17,7 +18,7 @@ import com.cesoft.organizate3.ui.theme.Organizate3Theme
 // Photo for tasks
 //
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {// ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

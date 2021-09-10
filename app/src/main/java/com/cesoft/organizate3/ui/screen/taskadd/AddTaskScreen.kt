@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -29,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.ui.composables.CheckboxCompo
-import com.cesoft.organizate3.ui.composables.DatePickerCompo
+import com.cesoft.organizate3.ui.composables.DateFieldCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
 import com.cesoft.organizate3.ui.composables.TextFieldAutoCompo
 import com.cesoft.organizate3.ui.composables.TextFieldCompo
@@ -42,10 +43,10 @@ import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Field
 import com.google.android.libraries.maps.model.LatLng
 
 
+@ExperimentalComposeUiApi
 @Composable
 fun AddTaskScreen(navController: NavHostController) {
     android.util.Log.e("AddTaskScreen", "AddTaskScreen----------------------0")
-
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { MainBottomNavigation(navController) }
@@ -83,6 +84,7 @@ private fun TopBar() {
     )
 }
 
+@ExperimentalComposeUiApi
 @Preview
 @Composable
 private fun Body() {
@@ -126,10 +128,12 @@ private fun Body() {
             changeField(Field.Type, it)
         }
         // Date picker
-        DatePickerCompo(dueDate, R.string.field_due_date) {
+        //DatePickerCompo(dueDate, R.string.field_due_date) {
+        DateFieldCompo(dueDate, R.string.field_due_date) {
             changeField(Field.DueDate, it)
             android.util.Log.e("AddTaskScreen", "Body----------------------date=$it")
         }
+
         // Done
         CheckboxCompo(done, R.string.field_done) {
             changeField(Field.Done, it)
