@@ -113,20 +113,24 @@ private fun Body() {
             .background(Color.LightGray)
             .verticalScroll(rememberScrollState())
     ) {
+
         // Name
         TextFieldCompo(name, R.string.field_name) {
             changeField(Field.Name, it)
         }
+
         // Description
         TextFieldCompo(description, R.string.field_description) {
             changeField(Field.Description, it)
         }
+
         // Type
         TextFieldAutoCompo(
             type, R.string.field_type, suggestions.value
         ) {
             changeField(Field.Type, it)
         }
+
         // Date picker
         //DatePickerCompo(dueDate, R.string.field_due_date) {
         DateFieldCompo(dueDate, R.string.field_due_date) {
@@ -138,15 +142,18 @@ private fun Body() {
         CheckboxCompo(done, R.string.field_done) {
             changeField(Field.Done, it)
         }
+
         //TODO: priority
         //TODO: Radius
+
         // Map
         MapCompo(latLng, viewModel.mapState) { latLng ->
             changeField(Field.LatLon, latLng)
         }
+
         // Spacer: bottom toolbar height so it doesnt hide map
         Column {
-            Spacer(Modifier.size(70.dp))
+            Spacer(Modifier.size(60.dp))//TODO: Get bottom toolbar height
         }
     }
 }

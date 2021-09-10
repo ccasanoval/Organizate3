@@ -16,6 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import com.cesoft.organizate3.ui.screen.MainBottomNavigation
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskScreen
 import com.cesoft.organizate3.ui.screen.taskdetail.TaskDetailScreen
 
+@ExperimentalComposeUiApi
 @Composable
 fun MainScreen() {
     val viewModel: MainViewModel = viewModel()

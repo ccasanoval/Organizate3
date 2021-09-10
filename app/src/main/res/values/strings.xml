@@ -18,4 +18,6 @@
     <string name="field_longitude">Longitude</string>
     <string name="field_radius">Radius</string>
 
+    <string name="field_date">Pick a date</string>
+
 </resources>
