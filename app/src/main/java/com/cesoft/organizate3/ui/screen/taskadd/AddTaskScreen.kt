@@ -151,14 +151,11 @@ private fun Body() {
             }
 
             // Priority
-            //RatingBarCompo(priority.value.toFloat())
             RatingBarCompo(
                 modifier = Modifier.padding(8.dp, 12.dp),
                 value = priority.value.toFloat(),
                 label = R.string.field_priority,
-                onValueChange = { android.util.Log.e("Rat", "--------------- onValueChange = $it") }
             ) {
-                android.util.Log.e("Rat", "--------------- onRatingChange = $it")
                 changeField(Field.Priority, it)
             }
         }

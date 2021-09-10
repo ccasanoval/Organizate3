@@ -53,7 +53,7 @@ private fun FilledStar(fraction: Float,activeColor: Color) = Canvas(
 }
 
 @Composable
-private fun EmptyStar(fraction: Float,ratingBarStyle: RatingBarStyle,inactiveColor: Color) = Canvas(
+private fun EmptyStar(fraction: Float, ratingBarStyle: RatingBarStyle,inactiveColor: Color) = Canvas(
     modifier = Modifier
         .fillMaxSize()
         .clip(FractionalRectangleShape(fraction, 1f))
@@ -113,7 +113,6 @@ class FractionalRectangleShape(
     }
 
 }
-
 
 fun Path.addStar(
     size: Size,

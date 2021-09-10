@@ -54,7 +54,7 @@ fun RatingBarCompo(
     hideInactiveStars: Boolean = false,
     ratingBarStyle: RatingBarStyle = RatingBarStyle.Normal,
     @StringRes label: Int = R.string.field_priority,
-    onValueChange: (Float) -> Unit,
+    //onValueChange: (Float) -> Unit,
     onRatingChanged: (Float) -> Unit
 ) {
     android.util.Log.e("Rat", "--------------- value = $value")
@@ -67,24 +67,29 @@ fun RatingBarCompo(
         .pointerInteropFilter {
             if(isIndicator || hideInactiveStars) return@pointerInteropFilter false
             when(it.action) {
-                MotionEvent.ACTION_DOWN -> { //handling when single click happens
+                //MotionEvent.ACTION_DOWN -> { //handling when single click happens
+                //    val calculatedStars = RatingBarUtils.calculateStars(
+                //        it.x, rowSize.width, numStars, padding.value.toInt()
+                //    )
+                //    val newValue = calculatedStars.stepSized(stepSize)
+                //    //onValueChange(newValue)
+                //    onRatingChanged(changedValue)
+                //}
+                //MotionEvent.ACTION_MOVE -> { //handling while dragging event
+                //    val x1 = it.x.coerceIn(0f, rowSize.width)
+                //    val calculatedStars = RatingBarUtils.calculateStars(
+                //        x1, rowSize.width, numStars, padding.value.toInt()
+                //    )
+                //    val newValue = calculatedStars.stepSized(stepSize)
+                //    //onValueChange(newValue)
+                //    changedValue = newValue
+                //}
+                MotionEvent.ACTION_DOWN -> {
                     val calculatedStars = RatingBarUtils.calculateStars(
                         it.x, rowSize.width, numStars, padding.value.toInt()
                     )
                     val newValue = calculatedStars.stepSized(stepSize)
-                    onValueChange(newValue)
-                    onRatingChanged(changedValue)
-                }
-                MotionEvent.ACTION_MOVE -> { //handling while dragging event
-                    val x1 = it.x.coerceIn(0f, rowSize.width)
-                    val calculatedStars = RatingBarUtils.calculateStars(
-                        x1, rowSize.width, numStars, padding.value.toInt()
-                    )
-                    val newValue = calculatedStars.stepSized(stepSize)
-                    onValueChange(newValue)
                     changedValue = newValue
-                }
-                MotionEvent.ACTION_UP -> { //when the click or drag is released
                     onRatingChanged(changedValue)
                 }
             }
@@ -153,9 +158,8 @@ fun ComposeStars(
 @Composable
 fun RatingBarPreview() {
     var rating by remember { mutableStateOf(3.3f) }
-    RatingBarCompo(value = rating, onValueChange = {
+    RatingBarCompo(value = rating) {
         rating = it
-    }) {
         android.util.Log.e("TAG", "-----------RatingBarPreview: $it")
     }
 }
