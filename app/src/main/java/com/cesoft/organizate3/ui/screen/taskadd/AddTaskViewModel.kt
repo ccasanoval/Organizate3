@@ -16,7 +16,7 @@ import java.util.*
 
 class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     enum class Field {
-        Name, Description, DueDate, Done, Type,
+        Name, Description, Type, DueDate, Done, Priority,
         LatLon, Zoom, Marker, MapState
     }//Priority,
     sealed class Intent {
@@ -35,16 +35,15 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     val type: StateFlow<String> = _type
     private val _done = MutableStateFlow(false)
     val done: StateFlow<Boolean> = _done
+    private val _priority = MutableStateFlow(Task.Priority.LOW)
+    val priority: StateFlow<Task.Priority> = _priority
     private val _dueDate = MutableStateFlow(Date())
     val dueDate: StateFlow<Date> = _dueDate
 
     //TODO: make a ViewModel just for the MapCompo with this kind of shit ?
     private val _latLng = MutableStateFlow(LatLng(0.0, 0.0))
     val latLng: StateFlow<LatLng> = _latLng
-    private val _zoom = MutableStateFlow(8f)
-    val zoom: StateFlow<Float> = _zoom
-    private val _marker = MutableStateFlow<Marker?>(null)
-    val marker: StateFlow<Marker?> = _marker
+
     //TEST
     data class MapState(var latLng: LatLng, var zoom: Float, var marker: Marker?)
     val mapState = MapState(LatLng(0.0, 0.0), 8f, null)
@@ -53,7 +52,6 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     val suggestions: StateFlow<List<String>> = _suggestion
 
     //TODO
-    var priority = MutableStateFlow(Task.Priority.LOW)
     var radius: Int=0
 
     init {
@@ -74,8 +72,7 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
                     Field.Done -> _done.value = intent.value as Boolean
                     Field.DueDate -> _dueDate.value = intent.value as Date
                     Field.LatLon -> _latLng.value = intent.value as LatLng
-                    Field.Zoom -> _zoom.value = intent.value as Float
-                    Field.Marker -> _marker.value = intent.value as Marker?
+                    Field.Priority -> _priority.value = Task.Priority.getByValue((intent.value as Float).toInt()) ?: Task.Priority.LOW
                 }
             }
             is Intent.Save -> {

@@ -3,8 +3,10 @@ package com.cesoft.organizate3.ui.screen.taskadd
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,9 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
+import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.composables.CheckboxCompo
 import com.cesoft.organizate3.ui.composables.DateFieldCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
+import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.composables.TextFieldAutoCompo
 import com.cesoft.organizate3.ui.composables.TextFieldCompo
 import com.cesoft.organizate3.ui.navigation.Screens
@@ -96,6 +100,7 @@ private fun Body() {
     val type: String by viewModel.type.collectAsState()
     val dueDate: Date by viewModel.dueDate.collectAsState()
     val done: Boolean by viewModel.done.collectAsState()
+    val priority: Task.Priority by viewModel.priority.collectAsState()
     val latLng: LatLng by viewModel.latLng.collectAsState()
     //val zoom: Float by viewModel.zoom.collectAsState()
     //val marker: Marker? by viewModel.marker.collectAsState()
@@ -138,12 +143,26 @@ private fun Body() {
             android.util.Log.e("AddTaskScreen", "Body----------------------date=$it")
         }
 
-        // Done
-        CheckboxCompo(done, R.string.field_done) {
-            changeField(Field.Done, it)
+        //TODO: Better box and priority float at end of line...
+        Row {
+            // Done
+            CheckboxCompo(done, R.string.field_done) {
+                changeField(Field.Done, it)
+            }
+
+            // Priority
+            //RatingBarCompo(priority.value.toFloat())
+            RatingBarCompo(
+                modifier = Modifier.padding(8.dp, 12.dp),
+                value = priority.value.toFloat(),
+                label = R.string.field_priority,
+                onValueChange = { android.util.Log.e("Rat", "--------------- onValueChange = $it") }
+            ) {
+                android.util.Log.e("Rat", "--------------- onRatingChange = $it")
+                changeField(Field.Priority, it)
+            }
         }
 
-        //TODO: priority
         //TODO: Radius
 
         // Map
