@@ -23,7 +23,7 @@ class TaskDetailViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repo = Repository(app.applicationContext)
 
-    private val _task = MutableStateFlow<Task>(Task())
+    private val _task = MutableStateFlow(Task())
     val task: Flow<Task> = _task
 
     suspend fun sendIntent(intent: Intent) {

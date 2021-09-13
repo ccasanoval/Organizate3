@@ -35,6 +35,7 @@ import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.composables.CheckboxCompo
 import com.cesoft.organizate3.ui.composables.DateFieldCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
+import com.cesoft.organizate3.ui.composables.RadiusCompo
 import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.composables.TextFieldAutoCompo
 import com.cesoft.organizate3.ui.composables.TextFieldCompo
@@ -45,7 +46,6 @@ import java.util.Date
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Intent
 import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Field
 import com.google.android.libraries.maps.model.LatLng
-
 
 @ExperimentalComposeUiApi
 @Composable
@@ -110,7 +110,7 @@ private fun Body() {
 
     Column(
         Modifier
-            .background(Color.LightGray)
+            //.background(Color.LightGray)
             .verticalScroll(rememberScrollState())
     ) {
 
@@ -155,7 +155,8 @@ private fun Body() {
             }
         }
 
-        //TODO: Radius
+        // Radius
+        RadiusCompo()
 
         // Map
         MapCompo(latLng, viewModel.mapState) { latLng ->

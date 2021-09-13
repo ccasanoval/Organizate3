@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.cesoft.organizate3.data.Repository
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
+import com.cesoft.organizate3.ui.composables.MapState
 import com.google.android.libraries.maps.model.LatLng
 import com.google.android.libraries.maps.model.Marker
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +17,7 @@ import java.util.*
 
 class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     enum class Field {
-        Name, Description, Type, DueDate, Done, Priority, LatLon
+        Name, Description, Type, DueDate, Done, Priority, LatLon, Radius
     }
     sealed class Intent {
         object Save : Intent()
@@ -40,16 +41,13 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     val dueDate: StateFlow<Date> = _dueDate
     private val _latLng = MutableStateFlow(LatLng(0.0, 0.0))
     val latLng: StateFlow<LatLng> = _latLng
+    private val _radius = MutableStateFlow(0)
+    val radius: StateFlow<Int> = _radius
 
-    //TEST
-    data class MapState(var latLng: LatLng, var zoom: Float, var marker: Marker?)
     val mapState = MapState(LatLng(0.0, 0.0), 8f, null)
 
     private val _suggestion = MutableStateFlow<List<String>>(listOf())
     val suggestions: StateFlow<List<String>> = _suggestion
-
-    //TODO
-    var radius: Int=0
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -69,12 +67,13 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
                     Field.Done -> _done.value = intent.value as Boolean
                     Field.DueDate -> _dueDate.value = intent.value as Date
                     Field.LatLon -> _latLng.value = intent.value as LatLng
+                    Field.Radius -> _radius.value = intent.value as Int
                     Field.Priority -> _priority.value = Task.Priority.getByValue((intent.value as Float).toInt()) ?: Task.Priority.LOW
                 }
             }
             is Intent.Save -> {
                 val task = Task(0, name.value, description.value, dueDate.value, done.value, priority.value,
-                    type.value, latLng.value.latitude, latLng.value.longitude, radius)
+                    type.value, latLng.value.latitude, latLng.value.longitude, radius.value)
                 android.util.Log.e("AddTaskView", "sendIntent---$intent--------***------ task=$task")
                 addTask(task)
             }

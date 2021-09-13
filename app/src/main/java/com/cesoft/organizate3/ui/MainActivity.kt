@@ -8,6 +8,8 @@ import com.cesoft.organizate3.ui.screen.tasklist.MainScreen
 import com.cesoft.organizate3.ui.theme.Organizate3Theme
 
 //TODO:
+// Delete task in task details
+// Edit task in task details
 // Common screen for editing and new task
 // Get current position for tasks
 // Radius in new task, and show in detail

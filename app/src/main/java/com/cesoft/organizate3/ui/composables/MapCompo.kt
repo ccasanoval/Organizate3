@@ -1,5 +1,6 @@
 package com.cesoft.organizate3.ui.composables
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,21 +19,30 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.cesoft.organizate3.R
-import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel
 import com.google.android.libraries.maps.CameraUpdateFactory
+import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
+import com.google.android.libraries.maps.model.CircleOptions
 import com.google.android.libraries.maps.model.LatLng
+import com.google.android.libraries.maps.model.Marker
 import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+data class MapState(
+    var latLng: LatLng,
+    var zoom: Float,
+    var marker: Marker?,
+    val readOnly: Boolean = false)
+
 @Composable
 fun MapCompo(
     value: LatLng,
-    mapState: AddTaskViewModel.MapState,
-    onValueChange: (LatLng) -> Unit
+    mapState: MapState,
+    radius: Int = 0,
+    onValueChange: ((LatLng) -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -50,11 +60,13 @@ fun MapCompo(
                 val map = mapView.awaitMap()
                 map.uiSettings.isZoomControlsEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = true
+                map.uiSettings.isMapToolbarEnabled = true
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(value, mapState.zoom))
                 map.setOnCameraMoveListener {
                     mapState.latLng = map.cameraPosition.target
                     mapState.zoom = map.cameraPosition.zoom
                 }
+                map.drawRadius(value, radius)
 
                 mapState.marker?.remove()
                 mapState.marker = map.addMarker(
@@ -62,19 +74,34 @@ fun MapCompo(
                         .title(markerTitle)
                         .position(value))
 
-                map.setOnMapClickListener { latLng: LatLng ->
-                    map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                    mapState.marker?.remove()
-                    mapState.marker = map.addMarker(
-                        MarkerOptions()
-                            .title(markerTitle)
-                            .position(latLng))
-                    //
-                    onValueChange(latLng)
+                if(mapState.readOnly) {
+                    map.uiSettings.isMapToolbarEnabled = false
+                }
+                else {
+                    map.setOnMapClickListener { latLng: LatLng ->
+                        map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                        mapState.marker?.remove()
+                        mapState.marker = map.addMarker(
+                            MarkerOptions().title(markerTitle).position(latLng)
+                        ) //
+                        onValueChange?.let {
+                            onValueChange(latLng)
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+private fun GoogleMap.drawRadius(latLng: LatLng, radius: Int) {
+    val circleOptions = CircleOptions()
+    circleOptions.center(latLng)
+    circleOptions.radius(radius.toDouble())
+    circleOptions.strokeColor(Color.RED)
+    circleOptions.fillColor(0x30ff0000)
+    circleOptions.strokeWidth(2f)
+    this.addCircle(circleOptions)
 }
 
 @Composable
