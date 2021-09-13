@@ -50,7 +50,6 @@ import com.google.android.libraries.maps.model.LatLng
 @ExperimentalComposeUiApi
 @Composable
 fun AddTaskScreen(navController: NavHostController) {
-    android.util.Log.e("AddTaskScreen", "AddTaskScreen----------------------0")
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { MainBottomNavigation(navController) }
@@ -92,8 +91,6 @@ private fun TopBar() {
 @Preview
 @Composable
 private fun Body() {
-    android.util.Log.e("AddTaskScreen", "Body----------------------0")
-
     val viewModel: AddTaskViewModel = viewModel()
     val name: String by viewModel.name.collectAsState()
     val description: String by viewModel.description.collectAsState()
@@ -102,8 +99,6 @@ private fun Body() {
     val done: Boolean by viewModel.done.collectAsState()
     val priority: Task.Priority by viewModel.priority.collectAsState()
     val latLng: LatLng by viewModel.latLng.collectAsState()
-    //val zoom: Float by viewModel.zoom.collectAsState()
-    //val marker: Marker? by viewModel.marker.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
     val changeField : (field: Field, value: Any?) -> Unit = { field, value ->

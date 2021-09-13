@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.PopupProperties
 
-
 @Composable
 fun TextFieldCompo(
     value: String,
@@ -50,12 +49,6 @@ fun TextFieldAutoCompo(
                 onValueChange(it)
             }
         )
-        //OutlinedTextField(
-        //    value = value,
-        //    onValueChange = { value = it },
-        //    modifier = Modifier.fillMaxWidth(),
-        //    label = {Text(stringResource(R.string.field_type))}
-        //)
     }
 }
 
@@ -67,6 +60,7 @@ private fun AutoCompleteText(
     label: @Composable (() -> Unit)? = null,
     allSuggestions: List<String> = emptyList()
 ) {
+    android.util.Log.e("AutoCompleteText", "AutoCompleteText------------------------------ $allSuggestions")
     val suggestions by remember { mutableStateOf(mutableListOf<String>()) }
     Column(modifier = modifier) {
         OutlinedTextField(

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
@@ -15,6 +16,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -25,8 +27,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.withArgs
@@ -44,6 +45,8 @@ fun MainScreen() {
         { MainBottomNavigation(navController) }
     val topBar: @Composable () -> Unit =
         { MainToolbar(viewModel) }
+
+    viewModel.sendIntent(MainViewModel.Intent.Init)
 
     NavHost(
         navController = navController,
@@ -77,23 +80,37 @@ fun MainScreen() {
 
 @Composable
 fun TasksView(viewModel: MainViewModel, navController: NavHostController) {
-    TasksList(viewModel) { task ->
-        navController.navigate(
-            Screens.TaskDetailScreen.withArgs(task)
-        )
+    //TasksList(viewModel) { task ->
+    //    navController.navigate(
+    //        Screens.TaskDetailScreen.withArgs(task)
+    //    )
+    //}
+    val state = viewModel.state.collectAsState(UseCaseResult.Loading)
+    when(state.value) {
+        is UseCaseResult.Loading -> {
+            android.util.Log.e("MainV", "Loading --------------------")
+        }
+        is UseCaseResult.Error -> {
+            android.util.Log.e("MainV", "Error --------------------")
+        }
+        is UseCaseResult.Success -> {
+            val tasks = ((state.value) as UseCaseResult.Success).data
+            TasksList(tasks) { task ->
+                navController.navigate(
+                    Screens.TaskDetailScreen.withArgs(task)
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun TasksList(viewModel: MainViewModel, onTaskClick: (task: Task) -> Unit) {
-    val tasks = viewModel.tasks.collectAsLazyPagingItems()
+fun TasksList(tasks: List<Task>, onTaskClick: (task: Task) -> Unit) {
     val listState = rememberLazyListState()
     LazyColumn(state = listState) {
         items(tasks) { task ->
-            task?.let {
-                TasksListRowView(it) { taskClicked ->
-                    onTaskClick(taskClicked)
-                }
+            TasksListRowView(task) { taskClicked ->
+                onTaskClick(taskClicked)
             }
         }
     }
@@ -104,6 +121,7 @@ fun TasksListRowView(
     task: Task,
     onClickListener: (task: Task) -> Unit
 ) {
+    val taskName = if(task.name.isEmpty()) "?" else task.name
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -115,7 +133,7 @@ fun TasksListRowView(
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp)) {
             Text(
-                task.name,
+                taskName,
                 style = MaterialTheme.typography.h6, maxLines = 1, overflow = TextOverflow.Ellipsis
             )
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
@@ -126,5 +144,5 @@ fun TasksListRowView(
             }
         }
     }
-    Divider(modifier = Modifier.padding(horizontal = 6.dp))
+    Divider(modifier = Modifier.padding(horizontal = 6.dp))//TODO:Dark mode color
 }

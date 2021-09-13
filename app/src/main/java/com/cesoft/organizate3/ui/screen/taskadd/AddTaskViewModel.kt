@@ -16,9 +16,8 @@ import java.util.*
 
 class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     enum class Field {
-        Name, Description, Type, DueDate, Done, Priority,
-        LatLon, Zoom, Marker, MapState
-    }//Priority,
+        Name, Description, Type, DueDate, Done, Priority, LatLon
+    }
     sealed class Intent {
         object Save : Intent()
         data class ChangeField(val field: Field, val value: Any?) : Intent()
@@ -39,8 +38,6 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     val priority: StateFlow<Task.Priority> = _priority
     private val _dueDate = MutableStateFlow(Date())
     val dueDate: StateFlow<Date> = _dueDate
-
-    //TODO: make a ViewModel just for the MapCompo with this kind of shit ?
     private val _latLng = MutableStateFlow(LatLng(0.0, 0.0))
     val latLng: StateFlow<LatLng> = _latLng
 

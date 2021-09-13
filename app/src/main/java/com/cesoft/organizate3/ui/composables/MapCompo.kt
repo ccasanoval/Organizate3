@@ -41,7 +41,7 @@ fun MapCompo(
             .padding(top = 8.dp)
             .size(400.dp)
     ) {
-        android.util.Log.e("MapCompo", "--------------------------------------------0- $value / $mapState : ${mapState.zoom} / ${mapState.marker} ")
+//android.util.Log.e("MapCompo", "--------------------------------------------0- $value / $mapState : ${mapState.zoom} / ${mapState.marker} ")
         val markerTitle = stringResource(R.string.new_task)
         val rememberMapView = rememberMapView()
 

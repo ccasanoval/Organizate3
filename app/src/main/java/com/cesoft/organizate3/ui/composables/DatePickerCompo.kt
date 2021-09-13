@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.cesoft.organizate3.R
+import com.cesoft.organizate3.ui.dateFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,14 +43,6 @@ fun DateFieldCompo(
         picker.show(activity.supportFragmentManager, picker.toString())
         picker.addOnPositiveButtonClickListener {
             updatedDate(Date(it))
-        }
-    }
-    fun Date.dateFormatter() : String {
-        this.time.let {
-            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
-            val calendar: Calendar = Calendar.getInstance()
-            calendar.timeInMillis = it
-            return formatter.format(calendar.time)
         }
     }
 

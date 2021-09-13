@@ -14,7 +14,7 @@ import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.model.Task
 
 const val TASK_ID = "TASK_ID"
-const val TASK_NAME = "TASK_NAME"
+//const val TASK_NAME = "TASK_NAME"
 
 sealed class Screens(
     val route: String,
@@ -27,16 +27,16 @@ sealed class Screens(
     object TasksScreen : Screens("Tasks", R.string.tasks, Icons.Default.Task)
     object AddTaskScreen : Screens("AddTask", R.string.new_task, Icons.Default.AddTask)
     object TaskDetailScreen : Screens("TaskDetail", R.string.tasks, Icons.Default.TaskAlt,
-        "/{$TASK_ID}/{$TASK_NAME}",
+        "/{$TASK_ID}",
         listOf(
             navArgument(TASK_ID) {
                 nullable = false
                 type = NavType.IntType
             },
-            navArgument(TASK_NAME) {
-                nullable = false
-                type = NavType.StringType
-            }
+            //navArgument(TASK_NAME) {
+            //    nullable = false
+            //    type = NavType.StringType
+            //}
         ))
 
     //
@@ -68,7 +68,7 @@ sealed class Screens(
     //}
 }
 
-fun Screens.TaskDetailScreen.withArgs(task: Task) = "$route/${task.id}/${task.name}"
+fun Screens.TaskDetailScreen.withArgs(task: Task) = "$route/${task.id}"
 
 fun NavBackStackEntry.getStringArg(key: String) =
     this.arguments?.getString(key).toString()

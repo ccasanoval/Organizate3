@@ -3,15 +3,15 @@ package com.cesoft.organizate3.ui.screen.tasklist
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.cesoft.organizate3.data.Repository
+import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
+import com.cesoft.organizate3.domain.usecase.GetTasksUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.*
+import kotlinx.coroutines.launch
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     sealed class Intent {
@@ -21,11 +21,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private val list0 = listOf(
-        Task(0,"Task 1", "The #1 task", Date(), false, Task.Priority.HIGH),
-        Task(1,"Task 2", "The #2 task", Date(), false, Task.Priority.MID),
-        Task(2,"Task 3", "The #3 task", Date(), true, Task.Priority.LOW)
+        Task(0,"Task 0", "The #0 task", java.util.Date(), true, Task.Priority.LOW, "Lmn", 40.50, -3.45, 100),
+        Task(1,"Task 1", "The #1 task", java.util.Date(), false, Task.Priority.HIGH, "Abc"),
+        Task(2,"Task 2", "The #2 task", java.util.Date(), false, Task.Priority.MID, "Zyx"),
+        Task(3,"Task 3", "The #3 task", java.util.Date(), true, Task.Priority.LOW, "Abc")
     )
-    private val list1 = listOf(
+/*    private val list1 = listOf(
         Task(0,"Task 1", "The #1 task", Date(), false),
         Task(1,"Task 2", "The #2 task", Date(), false),
         Task(2,"Task 3", "The #3 task", Date(), true),
@@ -41,29 +42,36 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         Task(12,"Task 23", "The #3 task", Date(), true),
         Task(13,"Task 24", "The #4 task", Date(), true),
         Task(14,"Task 25", "The #5 task", Date(), false),
-    )
+    )*/
 
     private val repo = Repository(app.applicationContext)
+    private val getTask = GetTasksUseCase(repo, Dispatchers.IO)
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
 
-    private val _tasks = MutableStateFlow(PagingData.from(list0))//.cachedIn(viewModelScope)
-    val tasks: Flow<PagingData<Task>> = _tasks.cachedIn(viewModelScope)
+    private val _state = MutableStateFlow<UseCaseResult<List<Task>>>(UseCaseResult.Loading)
+    val state: Flow<UseCaseResult<List<Task>>> = _state
 
-    suspend fun sendIntent(intent: Intent) {
+    fun sendIntent(intent: Intent) {
         when(intent) {
             is Intent.Init -> {
-                //
-                //repo.clean()
-                //for(task in list0) {
-                //    addTask(task)
-                //}
 
-                android.util.Log.e(TAG, "sendIntent---$intent--------------------------- ${list0.size}")
-                _tasks.emit(PagingData.from(repo.getTasks()))
+                viewModelScope.launch(Dispatchers.IO) {
+                    if(false) {
+                        repo.clean()
+                        for(task in list0) {
+                            addTask(task)
+                        }
+                        android.util.Log.e(TAG, "sendIntent-1--$intent--------------------------- ")
+                    }
+                    val res = getTask(null)
+                    _state.emit(res)
+                    android.util.Log.e(TAG, "sendIntent-1--------------------------- $res ")
+                }
+                //TODO: Use UseCases, remove repo !
             }
             is Intent.Search -> {
-                android.util.Log.e(TAG, "sendIntent---$intent--------------------------- ${list1.size}")
-                _tasks.emit(PagingData.from(list1))
+                android.util.Log.e(TAG, "sendIntent---$intent--------------------------- ")
+                //_tasks.emit(PagingData.from(list1))
             }
             is Intent.ItemClick -> {
                 android.util.Log.e(TAG, "sendIntent---$intent--------***------ ${intent.task}")

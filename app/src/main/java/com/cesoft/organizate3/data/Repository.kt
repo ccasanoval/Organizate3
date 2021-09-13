@@ -25,6 +25,11 @@ class Repository(applicationContext: Context): TaskRepository {
         return dao.getAll().toModel()
     }
 
+    override suspend fun getTaskById(id: Int): Task? {
+        val dao = db.taskDao()
+        return dao.getById(id)?.toModel()
+    }
+
     override suspend fun saveTask(task: Task) {
         val dao = db.taskDao()
         dao.insert(task.toDb())

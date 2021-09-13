@@ -24,6 +24,8 @@ import com.cesoft.organizate3.R
 import com.cesoft.organizate3.ui.composables.RatingBarUtils.stepSized
 import kotlin.math.roundToInt
 
+//https://github.com/a914-gowtham/compose-ratingbar
+
 sealed class StepSize {
     object ONE : StepSize()
     object HALF : StepSize()
@@ -54,11 +56,10 @@ fun RatingBarCompo(
     hideInactiveStars: Boolean = false,
     ratingBarStyle: RatingBarStyle = RatingBarStyle.Normal,
     @StringRes label: Int = R.string.field_priority,
+    labelCompo: (@Composable () -> Unit)? = null,
     //onValueChange: (Float) -> Unit,
-    onRatingChanged: (Float) -> Unit
+    onRatingChanged: ((Float) -> Unit)?=null
 ) {
-    android.util.Log.e("Rat", "--------------- value = $value")
-
     var rowSize by remember { mutableStateOf(Size.Zero) }
     var changedValue by remember { mutableStateOf(0f) }
 
@@ -90,12 +91,16 @@ fun RatingBarCompo(
                     )
                     val newValue = calculatedStars.stepSized(stepSize)
                     changedValue = newValue
-                    onRatingChanged(changedValue)
+                    onRatingChanged?.let {
+                        onRatingChanged(changedValue)
+                    }
                 }
             }
             true
         }) {
-        Text(text=stringResource(label), modifier = Modifier.padding(8.dp, 4.dp))
+        labelCompo?.let {
+            labelCompo()
+        } ?: Text(text=stringResource(label), modifier = Modifier.padding(8.dp, 4.dp))
         ComposeStars(
             value, numStars, size, padding, activeColor,
             inactiveColor, hideInactiveStars, ratingBarStyle

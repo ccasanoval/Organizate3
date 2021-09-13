@@ -12,25 +12,30 @@ interface TaskDao {
     @Query("SELECT * FROM tasks")
     fun getAll(): List<TaskEntity>
 
-    @Query("SELECT * FROM tasks WHERE id IN (:ids)")
-    fun getAllByIds(ids: IntArray): List<TaskEntity>
+    //@Query("SELECT * FROM tasks WHERE id IN (:ids)")
+    //fun getAllByIds(ids: IntArray): List<TaskEntity>
 
-    @Query("SELECT * FROM tasks WHERE name LIKE :name LIMIT 1")
-    fun getByName(name: String): TaskEntity
+    //@Query("SELECT * FROM tasks WHERE name LIKE :name LIMIT 1")
+    //fun getByName(name: String): TaskEntity
+
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    fun getById(id: Int): TaskEntity?
 
     @Query("SELECT DISTINCT(type) FROM tasks")
     fun getTaskTypes(): List<String>
 
+
     /// INSERT ----------------------------------------------------------------
-    @Insert
-    fun insertAll(vararg tasks: TaskEntity)
+    //@Insert
+    //fun insertAll(vararg tasks: TaskEntity)
 
     @Insert
     fun insert(task: TaskEntity)
 
+
     /// DELETE ----------------------------------------------------------------
-    @Delete
-    fun delete(user: TaskEntity)
+    //@Delete
+    //fun delete(user: TaskEntity)
 
     @Query("DELETE FROM tasks")
     fun deleteAll()
