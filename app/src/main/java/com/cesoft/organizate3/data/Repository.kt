@@ -15,10 +15,7 @@ class Repository(applicationContext: Context): TaskRepository {
         TaskDatabase::class.java, "organizate-tasks"
     ).build()
 
-    override suspend fun clean() {
-        val dao = db.taskDao()
-        dao.deleteAll()
-    }
+    // Select -------------------------------------------------------------------------------------
 
     override suspend fun getTasks(): List<Task> {
         val dao = db.taskDao()
@@ -30,13 +27,31 @@ class Repository(applicationContext: Context): TaskRepository {
         return dao.getById(id)?.toModel()
     }
 
+    override suspend fun getTaskTypes(): List<String> {
+        val dao = db.taskDao()
+        return dao.getTaskTypes()
+    }
+
+    // Insert -------------------------------------------------------------------------------------
+
     override suspend fun saveTask(task: Task) {
         val dao = db.taskDao()
         dao.insert(task.toDb())
     }
 
-    override suspend fun getTaskTypes(): List<String> {
+    // Delete -------------------------------------------------------------------------------------
+
+    override suspend fun clean() {
         val dao = db.taskDao()
-        return dao.getTaskTypes()
+        dao.deleteAll()
+    }
+
+    //override suspend fun deleteTask(task: Task) {
+    //    val dao = db.taskDao()
+    //    dao.delete(task.toDb())
+    //}
+    override suspend fun deleteTask(idTask: Int) {
+        val dao = db.taskDao()
+        dao.delete(idTask)
     }
 }

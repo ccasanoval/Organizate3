@@ -8,6 +8,7 @@
 
     <string name="search">Search</string>
     <string name="save">Save</string>
+    <string name="delete">Delete</string>
 
     <string name="field_name">Name</string>
     <string name="field_description">Description</string>
@@ -24,4 +25,16 @@
     <string name="task_done">Task is finished</string>
     <string name="task_undone">Task is pending</string>
 
+    <!-- Error messages -->
+    <string name="error_unkown_task">Task not found</string>
+    <string name="error_delete_task">Task deletion failure</string>
+
+    <!-- Success messages -->
+    <string name="ok_delete_task">Task deleted</string>
+    <string name="ok_add_task">Task created</string>
+    <string name="ok_save_task">Task saved</string>
+
+    <!-- Ask messages -->
+    <string name="ask_delete_task_title">Delete task?</string>
+    <string name="ask_delete_task_body">Are you sure you want to delete this task?</string>
 </resources>

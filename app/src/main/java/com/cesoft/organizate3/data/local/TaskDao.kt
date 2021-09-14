@@ -9,6 +9,7 @@ import androidx.room.Query
 interface TaskDao {
 
     /// QUERY -----------------------------------------------------------------
+
     @Query("SELECT * FROM tasks")
     fun getAll(): List<TaskEntity>
 
@@ -26,6 +27,7 @@ interface TaskDao {
 
 
     /// INSERT ----------------------------------------------------------------
+
     //@Insert
     //fun insertAll(vararg tasks: TaskEntity)
 
@@ -34,8 +36,11 @@ interface TaskDao {
 
 
     /// DELETE ----------------------------------------------------------------
+
     //@Delete
-    //fun delete(user: TaskEntity)
+    //fun delete(task: TaskEntity)
+    @Query("DELETE FROM tasks WHERE id = :id")
+    fun delete(id: Int)
 
     @Query("DELETE FROM tasks")
     fun deleteAll()
