@@ -26,7 +26,8 @@
     <string name="task_undone">Task is pending</string>
 
     <!-- Error messages -->
-    <string name="error_unkown_task">Task not found</string>
+    <string name="error_list_task">Task listing failure</string>
+    <string name="error_unkown_task">Not found task</string>
     <string name="error_delete_task">Task deletion failure</string>
     <string name="error_save_task">Task saving failure</string>
 

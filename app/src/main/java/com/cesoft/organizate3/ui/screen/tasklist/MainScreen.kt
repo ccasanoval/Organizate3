@@ -3,8 +3,10 @@ package com.cesoft.organizate3.ui.screen.tasklist
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -22,12 +24,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.composables.LoadingCompo
@@ -57,7 +63,7 @@ fun MainScreen() {
         navController.navigate(Screens.TaskDetailScreen.withArgs(it))
     }
 
-    val state = viewModel.state.collectAsState(State.Loading).value
+    //val state = viewModel.state.collectAsState(State.Loading).value
 
     NavHost(
         navController = navController,
@@ -70,7 +76,7 @@ fun MainScreen() {
                 topBar = topBar,
                 bottomBar = bottomBar
             ) {
-                TasksView(state) { task -> onSelectedTask(task) }
+                TasksView(viewModel.state) { task -> onSelectedTask(task) }
             }
         }
         composable(
@@ -98,14 +104,16 @@ fun TasksView(state: State, onSelectedTask: (task: Task) -> Unit) {
         }
         is State.Error -> {
             android.util.Log.e("MainV", "Error --------------------${state}")
+            val color = androidx.compose.ui.graphics.Color.Companion.Red
+            val text = stringResource(R.string.error_list_task)
+            Text(text, color = color, fontSize = 26.sp, fontWeight = FontWeight.Bold)
         }
         is State.Data -> {
             //collectAsLazyPagingItems
-            val tasksFlow = state.tasks
-            val tasks = tasksFlow.collectAsState(null).value
+            val tasks = state.tasks.collectAsState(null).value
             android.util.Log.e("MainV", "Success -------------------- $tasks")
             tasks?.let {
-                TasksList(tasks) { task -> onSelectedTask(task) }
+                TasksList(it) { task -> onSelectedTask(task) }
             }
         }
     }
@@ -113,12 +121,16 @@ fun TasksView(state: State, onSelectedTask: (task: Task) -> Unit) {
 
 @Composable
 fun TasksList(tasks: List<Task>, onTaskClick: (task: Task) -> Unit) {
+    android.util.Log.e("MainV", "TasksList -------------------- $tasks")
     val listState = rememberLazyListState()
     LazyColumn(state = listState) {
         items(tasks) { task ->
             TasksListRowView(task) { taskClicked ->
                 onTaskClick(taskClicked)
             }
+        }
+        item {//TODO: Spacer: bottom toolbar height so it doesnt hide last line ¿?!
+            Spacer(Modifier.size(80.dp))
         }
     }
 }
@@ -128,6 +140,8 @@ fun TasksListRowView(
     task: Task,
     onClickListener: (task: Task) -> Unit
 ) {
+    android.util.Log.e("MainV", "TasksList -------------------- $task")
+
     val taskName = if(task.name.isEmpty()) "?" else task.name
     Row(
         modifier = Modifier

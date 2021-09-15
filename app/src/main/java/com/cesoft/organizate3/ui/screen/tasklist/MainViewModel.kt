@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
@@ -28,8 +29,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val getTask = GetTasksUseCase(repo, Dispatchers.IO)//TODO: DI
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
 
-    private val _state = MutableStateFlow<State>(State.Loading)
-    val state: StateFlow<State> = _state
+    //private val _state = MutableStateFlow<State>(State.Loading)
+    //val state: StateFlow<State> = _state
+    var state: State = State.Loading
 
     //init {
     //    viewModelScope.launch {
@@ -49,9 +51,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 val res = getTask(null)
                 when(res) {
-                    UseCaseResult.Loading -> _state.emit(State.Loading)
-                    is UseCaseResult.Error -> _state.emit(State.Error)
-                    is UseCaseResult.Success -> _state.emit(State.Data(res.data))
+                    UseCaseResult.Loading -> state = State.Loading//_state.emit(State.Loading)
+                    is UseCaseResult.Error -> state = State.Error(res.exception)//_state.emit(State.Error(res.exception))
+                    is UseCaseResult.Success -> {
+                        //res.data.collect {
+                        //    _state.emit(State.Data(it))
+                        //}
+                        //_state.emit(State.Data(res.data))
+                        state = State.Data(res.data)
+                    }
                 }
                 //_state.emit(res)
                 Log.e(TAG, "sendIntent-1---------------------------res $res ")
