@@ -4,25 +4,22 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cesoft.organizate3.data.Repository
+import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
 import com.cesoft.organizate3.ui.composables.MapState
 import com.google.android.libraries.maps.model.LatLng
-import com.google.android.libraries.maps.model.Marker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
 class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
-    enum class Field {
-        Name, Description, Type, DueDate, Done, Priority, LatLon, Radius
-    }
-    sealed class Intent {
-        object Save : Intent()
-        data class ChangeField(val field: Field, val value: Any?) : Intent()
-    }
+
+    private val _state = MutableStateFlow<State>(State.Editing)
+    val state: Flow<State> = _state
 
     private val repo = Repository(app.applicationContext)
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
@@ -58,8 +55,6 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun sendIntent(intent: Intent) {
         when(intent) {
             is Intent.ChangeField -> {
-                android.util.Log.e("AddTaskView", "sendIntent---$intent--------***------${intent.field}")
-
                 when(intent.field) {
                     Field.Name -> _name.value = intent.value as String
                     Field.Description -> _description.value = intent.value as String
@@ -75,8 +70,13 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
                 val task = Task(0, name.value, description.value, dueDate.value, done.value, priority.value,
                     type.value, latLng.value.latitude, latLng.value.longitude, radius.value)
                 android.util.Log.e("AddTaskView", "sendIntent---$intent--------***------ task=$task")
-                addTask(task)
+                when(addTask(task)) {
+                    UseCaseResult.Loading -> _state.emit(State.Loading)
+                    is UseCaseResult.Error -> _state.emit(State.Error)
+                    is UseCaseResult.Success -> _state.emit(State.Saved)
+                }
             }
+            Intent.Done -> _state.emit(State.Editing)
         }
     }
 }

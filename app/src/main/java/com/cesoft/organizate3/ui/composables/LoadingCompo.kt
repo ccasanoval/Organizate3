@@ -18,21 +18,3 @@ fun LoadingCompo() {
         CircularProgressIndicator()
     }
 }
-
-@Composable
-fun LoadingContent(
-    loading: Boolean,
-    content: @Composable () -> Unit
-) {
-    if (loading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center)
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        content()
-    }
-}

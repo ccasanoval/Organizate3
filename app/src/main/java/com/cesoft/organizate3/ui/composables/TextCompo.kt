@@ -60,7 +60,6 @@ private fun AutoCompleteText(
     label: @Composable (() -> Unit)? = null,
     allSuggestions: List<String> = emptyList()
 ) {
-    android.util.Log.e("AutoCompleteText", "AutoCompleteText------------------------------ $allSuggestions")
     val suggestions by remember { mutableStateOf(mutableListOf<String>()) }
     Column(modifier = modifier) {
         OutlinedTextField(

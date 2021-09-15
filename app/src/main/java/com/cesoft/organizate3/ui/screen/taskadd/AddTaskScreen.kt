@@ -17,6 +17,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,14 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.composables.CheckboxCompo
 import com.cesoft.organizate3.ui.composables.DateFieldCompo
+import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
 import com.cesoft.organizate3.ui.composables.RadiusCompo
 import com.cesoft.organizate3.ui.composables.RatingBarCompo
@@ -41,15 +45,40 @@ import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
 import kotlinx.coroutines.launch
 import java.util.Date
-import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Intent
-import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel.Field
 import com.google.android.libraries.maps.model.LatLng
+import kotlinx.coroutines.MainScope
 
 @ExperimentalComposeUiApi
 @Composable
 fun AddTaskScreen(navController: NavHostController) {
+    val viewModel: AddTaskViewModel = viewModel()
+    val state: State by viewModel.state.collectAsState(State.Editing)
+
+    val coroutineScope = rememberCoroutineScope()
+    val onSave: () -> Unit = {
+        coroutineScope.launch {
+            viewModel.sendIntent(Intent.Save)
+        }
+    }
+android.util.Log.e("AddTaskV", "AddTaskScreen----------------- $state")
+    when(state) {
+        State.Loading -> Loading()
+        State.Editing -> Editing(navController, onSave)
+        State.Saved -> saved(viewModel, navController)//Saved(viewModel, navController)
+        State.Error -> Error(navController, onSave)
+    }
+}
+
+@Composable
+private fun Loading() {
+    LoadingCompo()
+}
+
+@ExperimentalComposeUiApi
+@Composable
+private fun Editing(navController: NavHostController, onSave: () -> Unit) {
     Scaffold(
-        topBar = { TopBar() },
+        topBar = { TopBar(onSave) },
         bottomBar = { MainBottomNavigation(navController) }
     ) {
         Body()
@@ -57,15 +86,37 @@ fun AddTaskScreen(navController: NavHostController) {
 }
 
 @Composable
-private fun TopBar() {
-    val viewModel: AddTaskViewModel = viewModel()
-    val coroutineScope = rememberCoroutineScope()
-    val onSave: () -> Unit = {
-        coroutineScope.launch {
-            viewModel.sendIntent(Intent.Save)
-            //TODO: if ok, go back to main
-        }
+private fun Saved(viewModel: AddTaskViewModel, navController: NavHostController) {
+    navController.navigate(Screens.TasksScreen.route) {
+        popUpTo(Screens.AddTaskScreen.route) { inclusive = true }
     }
+    LaunchedEffect(true) {
+        viewModel.sendIntent(Intent.Done)
+    }
+}
+private fun saved(viewModel: AddTaskViewModel, navController: NavHostController) {
+    MainScope().launch {
+        navController.navigate(Screens.TasksScreen.route) {
+            popUpTo(Screens.AddTaskScreen.route) { inclusive = true }
+        }
+        viewModel.sendIntent(Intent.Done)
+    }
+}
+
+@Composable
+private fun Error(navController: NavHostController, onSave: () -> Unit) {
+    Scaffold(
+        topBar = { TopBar(onSave) },
+        bottomBar = { MainBottomNavigation(navController) }
+    ) {
+        val color = androidx.compose.ui.graphics.Color.Companion.Red
+        val text = stringResource(R.string.error_save_task)
+        Text(text, color = color, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun TopBar(onSave: () -> Unit) {
     TopAppBar(
         title = { Text(stringResource(Screens.AddTaskScreen.label)) },
         actions = {

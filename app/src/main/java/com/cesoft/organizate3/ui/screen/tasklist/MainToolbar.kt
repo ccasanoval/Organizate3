@@ -20,8 +20,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainToolbar(viewModel: MainViewModel) {
+    val coroutineScope = rememberCoroutineScope()
     val onSearch: () -> Unit = {
-        viewModel.sendIntent(MainViewModel.Intent.Search)
+        coroutineScope.launch {
+            viewModel.sendIntent(Intent.Search)
+        }
     }
     return TopAppBar(
         title = {

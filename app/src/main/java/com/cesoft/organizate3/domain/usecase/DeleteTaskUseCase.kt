@@ -9,12 +9,3 @@ class DeleteTaskUseCase(
 ) : SuspendUseCase<Int, Unit>(ioDispatcher) {
     override suspend fun execute(parameters: Int) = repo.deleteTask(parameters)
 }
-
-/*
-class DeleteTaskUseCase(
-    private val repo: TaskRepository,
-    ioDispatcher: CoroutineDispatcher
-) : SuspendUseCase<Task, Unit>(ioDispatcher) {
-    override suspend fun execute(parameters: Task) = repo.deleteTask(parameters)
-}
-*/

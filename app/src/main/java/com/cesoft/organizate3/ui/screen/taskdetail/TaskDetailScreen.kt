@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -27,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,30 +43,26 @@ import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.TASK_ID
 import com.google.android.libraries.maps.model.LatLng
-
-//TODO: cuando pulsas borrar poner el loading
-//TODO: cuando finaliza el borrado volver a main y refrescar
+import kotlinx.coroutines.launch
 
 @Composable
-fun TaskDetailScreen(
-    args: Bundle?,
-    popBack: () -> Unit
-) {
+fun TaskDetailScreen(args: Bundle?, popBack: () -> Unit) {
     val id = args?.getInt(TASK_ID) ?: -1
     val viewModel: TaskDetailViewModel = viewModel()
     LaunchedEffect(id) {
-        viewModel.sendIntent(TaskDetailViewModel.Intent.Init(id))
+        viewModel.sendIntent(Intent.Init(id))
     }
     TaskDetailContent(viewModel, popBack)
 }
 
 @Composable
 private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Unit) {
-    val state: TaskDetailViewModel.State by viewModel.state.collectAsState(viewModel.fetchLoadingState)
+    val coroutineScope = rememberCoroutineScope()
+    val state: State by viewModel.state.collectAsState(viewModel.stateInit)
     var task: Task? = null
     when(state) {
-        is TaskDetailViewModel.State.Fetch -> {
-            val fetch = state as TaskDetailViewModel.State.Fetch
+        is State.Fetch -> {
+            val fetch = state as State.Fetch
             when(fetch.res) {
                 UseCaseResult.Loading -> {
                     android.util.Log.e("TaskDetailView", "fetch----------loading ")
@@ -82,8 +78,8 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Uni
                 }
             }
         }
-        is TaskDetailViewModel.State.Delete -> {
-            val fetch = state as TaskDetailViewModel.State.Delete
+        is State.Delete -> {
+            val fetch = state as State.Delete
             when(fetch.res) {
                 is UseCaseResult.Loading -> {
                     android.util.Log.e("TaskDetailView", "delete----------loading")
@@ -107,7 +103,9 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Uni
     ) {
         if(showDialog.value) {
             DeleteConfirmDialog(showDialog) {
-                viewModel.sendIntent(TaskDetailViewModel.Intent.Delete)
+                coroutineScope.launch {
+                    viewModel.sendIntent(Intent.Delete)
+                }
             }
         }
         else {

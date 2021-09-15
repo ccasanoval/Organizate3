@@ -28,6 +28,7 @@
     <!-- Error messages -->
     <string name="error_unkown_task">Task not found</string>
     <string name="error_delete_task">Task deletion failure</string>
+    <string name="error_save_task">Task saving failure</string>
 
     <!-- Success messages -->
     <string name="ok_delete_task">Task deleted</string>
