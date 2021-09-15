@@ -1,10 +1,11 @@
 package com.cesoft.organizate3.domain.repo
 
 import com.cesoft.organizate3.domain.model.Task
+import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
     // Select -------------------------------------------------------------------------------------
-    suspend fun getTasks(): List<Task>
+    suspend fun getTasks(): Flow<List<Task>>
     suspend fun getTaskById(id: Int): Task?
     suspend fun getTaskTypes(): List<String>
     // Insert -------------------------------------------------------------------------------------

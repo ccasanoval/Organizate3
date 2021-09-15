@@ -7,6 +7,7 @@ import com.cesoft.organizate3.data.local.toDb
 import com.cesoft.organizate3.data.local.toModel
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.repo.TaskRepository
+import kotlinx.coroutines.flow.Flow
 
 class Repository(applicationContext: Context): TaskRepository {
 
@@ -17,7 +18,7 @@ class Repository(applicationContext: Context): TaskRepository {
 
     // Select -------------------------------------------------------------------------------------
 
-    override suspend fun getTasks(): List<Task> {
+    override suspend fun getTasks(): Flow<List<Task>> {
         val dao = db.taskDao()
         return dao.getAll().toModel()
     }

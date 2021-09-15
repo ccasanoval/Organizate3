@@ -3,12 +3,17 @@ package com.cesoft.organizate3.domain.usecase
 import com.cesoft.organizate3.domain.repo.TaskRepository
 import com.cesoft.organizate3.domain.model.Task
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 
 class GetTasksUseCase(
     private val repo: TaskRepository,
     ioDispatcher: CoroutineDispatcher
-) : SuspendUseCase<Any?, List<Task>>(ioDispatcher) {
-    override suspend fun execute(parameters: Any?): List<Task> = repo.getTasks()
+) : SuspendUseCase<Any?, Flow<List<Task>>>(ioDispatcher) {
+    override suspend fun execute(parameters: Any?): Flow<List<Task>> {
+        delay(2000)//TODO:Test
+        return repo.getTasks()
+    }
 }
 
 /*

@@ -20,17 +20,15 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,15 +36,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
+import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
 import com.cesoft.organizate3.ui.composables.MapState
 import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.TASK_ID
-import com.cesoft.organizate3.ui.screen.tasklist.MainViewModel
 import com.google.android.libraries.maps.model.LatLng
 
-//TODO: preguntar antes de borrar
 //TODO: cuando pulsas borrar poner el loading
 //TODO: cuando finaliza el borrado volver a main y refrescar
 
@@ -73,7 +70,7 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Uni
             when(fetch.res) {
                 UseCaseResult.Loading -> {
                     android.util.Log.e("TaskDetailView", "fetch----------loading ")
-                    Loading()
+                    LoadingCompo()
                 }
                 is UseCaseResult.Success -> {
                     android.util.Log.e("TaskDetailView", "fetch----------success "+fetch.res.data)
@@ -90,10 +87,11 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Uni
             when(fetch.res) {
                 is UseCaseResult.Loading -> {
                     android.util.Log.e("TaskDetailView", "delete----------loading")
-                    Loading()
+                    LoadingCompo()
                 }
                 is UseCaseResult.Success -> {
                     android.util.Log.e("TaskDetailView", "delete----------success"+fetch.res.data)
+                    popBack()
                 }
                 is UseCaseResult.Error -> {
                     android.util.Log.e("TaskDetailView", "delete----------error "+fetch.res.exception)
@@ -104,33 +102,13 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Uni
     }
 
     val showDialog = remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = { TopBar(task?.name ?: "?", popBack, { showDialog.value = true }) }
     ) {
         if(showDialog.value) {
-            AlertDialog(
-                title = { Text(stringResource(R.string.ask_delete_task_title)) },
-                text = { Text(stringResource(R.string.ask_delete_task_body)) },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            viewModel.sendIntent(TaskDetailViewModel.Intent.Delete)
-                            showDialog.value = false
-                        }) {
-                        Text(stringResource(android.R.string.ok))
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = {
-                            showDialog.value = false
-                        }) {
-                        Text(stringResource(android.R.string.cancel))
-                    }
-                },
-                onDismissRequest = { showDialog.value = false },
-            )
+            DeleteConfirmDialog(showDialog) {
+                viewModel.sendIntent(TaskDetailViewModel.Intent.Delete)
+            }
         }
         else {
             task?.let {
@@ -140,6 +118,32 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Uni
             }
         }
     }
+}
+
+@Composable
+private fun DeleteConfirmDialog(showDialog: MutableState<Boolean>, onOk: () -> Unit) {
+    AlertDialog(
+        title = { Text(stringResource(R.string.ask_delete_task_title)) },
+        text = { Text(stringResource(R.string.ask_delete_task_body)) },
+        confirmButton = {
+            Button(
+                onClick = {
+                    showDialog.value = false
+                    onOk()
+                }) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    showDialog.value = false
+                }) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+        onDismissRequest = { showDialog.value = false },
+    )
 }
 
 @Composable
@@ -264,9 +268,4 @@ private fun ErrorTaskDelete() {
     val color = androidx.compose.ui.graphics.Color.Companion.Red
     val text = stringResource(R.string.error_delete_task)
     Text(text, color = color, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-}
-
-@Composable
-private fun Loading() {
-    CircularProgressIndicator()
 }

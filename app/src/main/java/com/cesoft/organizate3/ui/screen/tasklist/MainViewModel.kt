@@ -1,6 +1,7 @@
 package com.cesoft.organizate3.ui.screen.tasklist
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cesoft.organizate3.data.Repository
@@ -48,33 +49,32 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val getTask = GetTasksUseCase(repo, Dispatchers.IO)
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
 
-    private val _state = MutableStateFlow<UseCaseResult<List<Task>>>(UseCaseResult.Loading)
-    val state: Flow<UseCaseResult<List<Task>>> = _state
+    private val _state = MutableStateFlow<UseCaseResult<Flow<List<Task>>>>(UseCaseResult.Loading)
+    val state: Flow<UseCaseResult<Flow<List<Task>>>> = _state
 
     fun sendIntent(intent: Intent) {
         when(intent) {
-            is Intent.Init -> {
-
+            Intent.Init -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     if(false) {
                         repo.clean()
                         for(task in list0) {
                             addTask(task)
                         }
-                        android.util.Log.e(TAG, "sendIntent-1--$intent--------------------------- ")
+                        Log.e(TAG, "sendIntent-1--$intent--------------------------- ")
                     }
                     val res = getTask(null)
                     _state.emit(res)
-                    android.util.Log.e(TAG, "sendIntent-1--------------------------- $res ")
+                    Log.e(TAG, "sendIntent-1--------------------------- $res ")
                 }
                 //TODO: Use UseCases, remove repo !
             }
-            is Intent.Search -> {
-                android.util.Log.e(TAG, "sendIntent---$intent--------------------------- ")
+            Intent.Search -> {
+                Log.e(TAG, "sendIntent---$intent--------------------------- ")
                 //_tasks.emit(PagingData.from(list1))
             }
             is Intent.ItemClick -> {
-                android.util.Log.e(TAG, "sendIntent---$intent--------***------ ${intent.task}")
+                Log.e(TAG, "sendIntent---$intent--------***------ ${intent.task}")
             }
         }
     }

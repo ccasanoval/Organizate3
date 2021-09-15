@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
+import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
@@ -80,25 +81,24 @@ fun MainScreen() {
 
 @Composable
 fun TasksView(viewModel: MainViewModel, navController: NavHostController) {
-    //TasksList(viewModel) { task ->
-    //    navController.navigate(
-    //        Screens.TaskDetailScreen.withArgs(task)
-    //    )
-    //}
     val state = viewModel.state.collectAsState(UseCaseResult.Loading)
     when(state.value) {
         is UseCaseResult.Loading -> {
             android.util.Log.e("MainV", "Loading --------------------")
+            LoadingCompo()
         }
         is UseCaseResult.Error -> {
-            android.util.Log.e("MainV", "Error --------------------")
+            android.util.Log.e("MainV", "Error --------------------${(state.value as UseCaseResult.Error).exception}")
         }
         is UseCaseResult.Success -> {
-            val tasks = ((state.value) as UseCaseResult.Success).data
-            TasksList(tasks) { task ->
-                navController.navigate(
-                    Screens.TaskDetailScreen.withArgs(task)
-                )
+            //collectAsLazyPagingItems
+            val tasks = ((state.value) as UseCaseResult.Success).data.collectAsState(null)
+            tasks.value?.let {
+                TasksList(it) { task ->
+                    navController.navigate(
+                        Screens.TaskDetailScreen.withArgs(task)
+                    )
+                }
             }
         }
     }

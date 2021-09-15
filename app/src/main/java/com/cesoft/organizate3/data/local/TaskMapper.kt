@@ -1,7 +1,11 @@
 package com.cesoft.organizate3.data.local
 
 import com.cesoft.organizate3.domain.model.Task
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.Date
+
+fun Flow<List<TaskEntity>>.toModel() = this.map { taskEntity ->  taskEntity.toModel() }
 
 fun TaskEntity.toModel() =
     Task(

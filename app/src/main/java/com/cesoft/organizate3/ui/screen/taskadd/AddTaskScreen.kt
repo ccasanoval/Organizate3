@@ -1,6 +1,5 @@
 package com.cesoft.organizate3.ui.screen.taskadd
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +23,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,6 +63,7 @@ private fun TopBar() {
     val onSave: () -> Unit = {
         coroutineScope.launch {
             viewModel.sendIntent(Intent.Save)
+            //TODO: if ok, go back to main
         }
     }
     TopAppBar(
@@ -92,6 +91,7 @@ private fun TopBar() {
 @Composable
 private fun Body() {
     val viewModel: AddTaskViewModel = viewModel()
+
     val name: String by viewModel.name.collectAsState()
     val description: String by viewModel.description.collectAsState()
     val type: String by viewModel.type.collectAsState()
