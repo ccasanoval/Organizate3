@@ -29,12 +29,14 @@ class TaskDetailViewModel(app: Application) : AndroidViewModel(app) {
             is Intent.Init -> {
                 idTask = intent.idTask
                 val res = getTask(idTask)//repo.getTaskById(intent.idTask)
-                android.util.Log.e("TaskDetVM", "sendIntent:Init----------------${intent.idTask} = $res")
                 _state.emit(State.Fetch(res))
             }
-            is Intent.Delete -> {
+            Intent.Delete -> {
                 val res = deleteTask(idTask)
                 _state.emit(State.Delete(res))
+            }
+            Intent.Done -> {
+                _state.emit(State.Done)
             }
         }
     }

@@ -40,6 +40,7 @@ sealed class RatingBarStyle {
 val StarRatingKey = SemanticsPropertyKey<Float>("StarRating")
 var SemanticsPropertyReceiver.starRating by StarRatingKey
 
+//TODO: Darkmode : change colors
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -51,7 +52,7 @@ fun RatingBarCompo(
     padding: Dp = 2.dp,
     isIndicator: Boolean = false,
     activeColor: Color = Color(0xffffd740),
-    inactiveColor: Color = Color(0x55ffecb3),
+    inactiveColor: Color = Color(0x77ffecb3),
     stepSize: StepSize = StepSize.ONE,
     hideInactiveStars: Boolean = false,
     ratingBarStyle: RatingBarStyle = RatingBarStyle.Normal,

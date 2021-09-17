@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
@@ -41,60 +42,75 @@ import com.cesoft.organizate3.ui.composables.MapCompo
 import com.cesoft.organizate3.ui.composables.MapState
 import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateFormatter
+import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.TASK_ID
+import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel
 import com.google.android.libraries.maps.model.LatLng
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun TaskDetailScreen(args: Bundle?, popBack: () -> Unit) {
+fun TaskDetailScreen(args: Bundle?, navController: NavHostController, popBack: () -> Unit) {
     val id = args?.getInt(TASK_ID) ?: -1
     val viewModel: TaskDetailViewModel = viewModel()
     LaunchedEffect(id) {
         viewModel.sendIntent(Intent.Init(id))
     }
-    TaskDetailContent(viewModel, popBack)
+    TaskDetailContent(viewModel, navController, popBack)
+}
+
+private fun deleted(viewModel: TaskDetailViewModel, navController: NavHostController) {
+    MainScope().launch {
+        navController.navigate(Screens.TasksScreen.route) {
+            popUpTo(Screens.TaskDetailScreen.route) { inclusive = true }
+        }
+        viewModel.sendIntent(Intent.Done)
+    }
 }
 
 @Composable
-private fun TaskDetailContent(viewModel: TaskDetailViewModel, popBack: () -> Unit) {
+private fun TaskDetailContent(viewModel: TaskDetailViewModel, navController: NavHostController, popBack: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val state: State by viewModel.state.collectAsState(viewModel.stateInit)
     var task: Task? = null
     when(state) {
         is State.Fetch -> {
-            val fetch = state as State.Fetch
-            when(fetch.res) {
+            when(val res = (state as State.Fetch).res) {
                 UseCaseResult.Loading -> {
                     android.util.Log.e("TaskDetailView", "fetch----------loading ")
                     LoadingCompo()
                 }
                 is UseCaseResult.Success -> {
-                    android.util.Log.e("TaskDetailView", "fetch----------success "+fetch.res.data)
-                    task = fetch.res.data
+                    android.util.Log.e("TaskDetailView", "fetch----------success "+res.data)
+                    task = res.data
                 }
                 is UseCaseResult.Error -> {
-                    android.util.Log.e("TaskDetailView", "fetch----------error "+fetch.res.exception)
+                    android.util.Log.e("TaskDetailView", "fetch----------error "+res.exception)
                     ErrorTaskNotFound()
                 }
             }
         }
         is State.Delete -> {
-            val fetch = state as State.Delete
-            when(fetch.res) {
+            when(val res = (state as State.Delete).res) {
                 is UseCaseResult.Loading -> {
                     android.util.Log.e("TaskDetailView", "delete----------loading")
                     LoadingCompo()
                 }
                 is UseCaseResult.Success -> {
-                    android.util.Log.e("TaskDetailView", "delete----------success"+fetch.res.data)
-                    popBack()
+                    android.util.Log.e("TaskDetailView", "delete----------success ${res.data}")
+                    LaunchedEffect(true) {
+                        viewModel.sendIntent(Intent.Done)
+                    }
+                    deleted(viewModel, navController)
+                    //popBack()
                 }
                 is UseCaseResult.Error -> {
-                    android.util.Log.e("TaskDetailView", "delete----------error "+fetch.res.exception)
+                    android.util.Log.e("TaskDetailView", "delete----------error ${res.exception}")
                     ErrorTaskDelete()
                 }
             }
         }
+        State.Done -> {}
     }
 
     val showDialog = remember { mutableStateOf(false) }

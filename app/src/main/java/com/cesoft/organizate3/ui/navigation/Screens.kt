@@ -22,7 +22,6 @@ sealed class Screens(
     val argsDef: String = "",
     val args: List<NamedNavArgument> = emptyList()
 ) {
-
     object TasksScreen : Screens("Tasks", R.string.tasks, Icons.Default.Task)
     object AddTaskScreen : Screens("AddTask", R.string.new_task, Icons.Default.AddTask)
     object TaskDetailScreen : Screens("TaskDetail", R.string.tasks, Icons.Default.TaskAlt,
@@ -36,6 +35,6 @@ sealed class Screens(
 }
 
 fun Screens.TaskDetailScreen.withArgs(task: Task) = "$route/${task.id}"
-
-fun NavBackStackEntry.getStringArg(key: String) =
-    this.arguments?.getString(key).toString()
+//
+//fun NavBackStackEntry.getStringArg(key: String) =
+//    this.arguments?.getString(key).toString()

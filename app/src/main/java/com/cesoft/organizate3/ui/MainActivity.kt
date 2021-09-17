@@ -16,7 +16,7 @@ import com.cesoft.organizate3.ui.theme.Organizate3Theme
 // Geofencing alerts
 // Make compatible with Huawei maps also (HMS)
 // Photo for tasks
-//
+// Order tasks by dueDate in the main list!
 
 @ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity() {

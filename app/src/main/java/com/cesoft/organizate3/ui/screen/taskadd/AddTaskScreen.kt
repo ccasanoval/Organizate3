@@ -1,6 +1,7 @@
 package com.cesoft.organizate3.ui.screen.taskadd
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -80,8 +81,10 @@ private fun Editing(navController: NavHostController, onSave: () -> Unit) {
     Scaffold(
         topBar = { TopBar(onSave) },
         bottomBar = { MainBottomNavigation(navController) }
-    ) {
-        Body()
+    ) { innerPadding ->
+        Box(Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())) {
+            Body()
+        }
     }
 }
 
@@ -212,11 +215,6 @@ private fun Body() {
         // Map
         MapCompo(latLng, viewModel.mapState) { latLng ->
             changeField(Field.LatLon, latLng)
-        }
-
-        // Spacer: bottom toolbar height so it doesnt hide map
-        Column {
-            Spacer(Modifier.size(60.dp))//TODO: Get bottom toolbar height
         }
     }
 }
