@@ -40,6 +40,13 @@ class Repository(applicationContext: Context): TaskRepository {
         dao.insert(task.toDb())
     }
 
+    // Update -------------------------------------------------------------------------------------
+
+    override suspend fun updateTask(task: Task) {
+        val dao = db.taskDao()
+        dao.update(task.toDb())
+    }
+
     // Delete -------------------------------------------------------------------------------------
 
     override suspend fun clean() {

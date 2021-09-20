@@ -10,6 +10,8 @@ interface TaskRepository {
     suspend fun getTaskTypes(): List<String>
     // Insert -------------------------------------------------------------------------------------
     suspend fun saveTask(task: Task)
+    // Update -------------------------------------------------------------------------------------
+    suspend fun updateTask(task: Task)
     // Delete -------------------------------------------------------------------------------------
     //suspend fun deleteTask(task: Task)
     suspend fun deleteTask(idTask: Int)

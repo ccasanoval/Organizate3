@@ -19,6 +19,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -44,9 +45,8 @@ import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.TASK_ID
-import com.cesoft.organizate3.ui.screen.taskadd.AddTaskViewModel
+import com.cesoft.organizate3.ui.navigation.withArgs
 import com.google.android.libraries.maps.model.LatLng
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,18 +59,25 @@ fun TaskDetailScreen(args: Bundle?, navController: NavHostController, popBack: (
     TaskDetailContent(viewModel, navController, popBack)
 }
 
-private fun deleted(viewModel: TaskDetailViewModel, navController: NavHostController) {
-    MainScope().launch {
-        navController.navigate(Screens.TasksScreen.route) {
-            popUpTo(Screens.TaskDetailScreen.route) { inclusive = true }
-        }
-        viewModel.sendIntent(Intent.Done)
-    }
-}
 
 @Composable
 private fun TaskDetailContent(viewModel: TaskDetailViewModel, navController: NavHostController, popBack: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
+
+    fun onDeleted(viewModel: TaskDetailViewModel, navController: NavHostController) {
+        coroutineScope.launch {
+            navController.navigate(Screens.TasksScreen.route) {
+                popUpTo(Screens.TaskDetailScreen.route) { inclusive = true }
+            }
+            viewModel.sendIntent(Intent.Done)
+        }
+    }
+    fun onEdit(task: Task?) {
+        task?.let {
+            navController.navigate(Screens.EditTaskScreen.withArgs(it))
+        }
+    }
+
     val state: State by viewModel.state.collectAsState(viewModel.stateInit)
     var task: Task? = null
     when(state) {
@@ -101,7 +108,7 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, navController: Nav
                     LaunchedEffect(true) {
                         viewModel.sendIntent(Intent.Done)
                     }
-                    deleted(viewModel, navController)
+                    onDeleted(viewModel, navController)
                     //popBack()
                 }
                 is UseCaseResult.Error -> {
@@ -113,12 +120,19 @@ private fun TaskDetailContent(viewModel: TaskDetailViewModel, navController: Nav
         State.Done -> {}
     }
 
-    val showDialog = remember { mutableStateOf(false) }
+    val showDeleteDialog = remember { mutableStateOf(false) }
     Scaffold(
-        topBar = { TopBar(task?.name ?: "?", popBack, { showDialog.value = true }) }
+        topBar = {
+            TopBar(
+                task?.name ?: "?",
+                popBack,
+                { onEdit(task) },
+                { showDeleteDialog.value = true }
+            )
+        }
     ) {
-        if(showDialog.value) {
-            DeleteConfirmDialog(showDialog) {
+        if(showDeleteDialog.value) {
+            DeleteConfirmDialog(showDeleteDialog) {
                 coroutineScope.launch {
                     viewModel.sendIntent(Intent.Delete)
                 }
@@ -164,6 +178,7 @@ private fun DeleteConfirmDialog(showDialog: MutableState<Boolean>, onOk: () -> U
 private fun TopBar(
     name: String,
     popBack: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     TopAppBar(
@@ -174,6 +189,9 @@ private fun TopBar(
             }
         },
         actions = {
+            IconButton(onClick = onEdit) {
+                Icon(Icons.Filled.Edit, stringResource(R.string.edit))
+            }
             IconButton(onClick = onDelete) {
                 Icon(Icons.Filled.Delete, stringResource(R.string.delete))
             }

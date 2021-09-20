@@ -38,8 +38,9 @@ import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
-import com.cesoft.organizate3.ui.screen.taskadd.AddTaskScreen
+//import com.cesoft.organizate3.ui.screen.taskadd.AddTaskScreen
 import com.cesoft.organizate3.ui.screen.taskdetail.TaskDetailScreen
+import com.cesoft.organizate3.ui.screen.taskedit.EditTaskScreen
 
 @ExperimentalComposeUiApi
 @Composable
@@ -62,6 +63,7 @@ fun MainScreen() {
 
     //val state = viewModel.state.collectAsState(State.Loading).value
 
+    //TODO: Mover a un archivo de navigation...
     NavHost(
         navController = navController,
         startDestination = Screens.TasksScreen.route
@@ -73,7 +75,10 @@ fun MainScreen() {
                 topBar = topBar,
                 bottomBar = bottomBar
             ) { innerPadding ->
-                Box(Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(bottom = innerPadding.calculateBottomPadding())) {
                     TasksView(viewModel.state) { task -> onSelectedTask(task) }
                 }
             }
@@ -81,13 +86,22 @@ fun MainScreen() {
         composable(
             route = Screens.AddTaskScreen.route,
         ) {
-            AddTaskScreen(navController)
+            //AddTaskScreen(navController)
+            EditTaskScreen(args = null, navController) { }
         }
         composable(
             route = Screens.TaskDetailScreen.route + Screens.TaskDetailScreen.argsDef,
             arguments = Screens.TaskDetailScreen.args,
         ) {
             TaskDetailScreen(it.arguments, navController) {
+                navController.popBackStack()
+            }
+        }
+        composable(
+            route = Screens.EditTaskScreen.route + Screens.EditTaskScreen.argsDef,
+            arguments = Screens.EditTaskScreen.args,
+        ) {
+            EditTaskScreen(it.arguments, navController) {
                 navController.popBackStack()
             }
         }

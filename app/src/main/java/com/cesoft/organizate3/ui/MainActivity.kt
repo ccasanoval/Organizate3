@@ -8,15 +8,14 @@ import com.cesoft.organizate3.ui.screen.tasklist.MainScreen
 import com.cesoft.organizate3.ui.theme.Organizate3Theme
 
 //TODO:
-// Delete task in task details
-// Edit task in task details
-// Common screen for editing and new task
-// Get current position for tasks
-// Radius in new task, and show in detail
+// Remove AddTask and use EditTask...
+// Tests to check if editTask screen works and initializes from task passed...
+// DI
+// Get current geolocation for tasks
 // Geofencing alerts
 // Make compatible with Huawei maps also (HMS)
 // Photo for tasks
-// Order tasks by dueDate in the main list!
+// Order tasks by: dueDate, geolocation, priority, in the main list!
 
 @ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity() {
