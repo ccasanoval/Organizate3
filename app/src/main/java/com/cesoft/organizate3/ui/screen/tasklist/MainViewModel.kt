@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cesoft.organizate3.data.Repository
 import com.cesoft.organizate3.domain.UseCaseResult
+import com.cesoft.organizate3.domain.data
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
 import com.cesoft.organizate3.domain.usecase.GetTasksUseCase
@@ -29,15 +30,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val getTask = GetTasksUseCase(repo, Dispatchers.IO)//TODO: DI
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
 
-    //private val _state = MutableStateFlow<State>(State.Loading)
-    //val state: StateFlow<State> = _state
-    var state: State = State.Loading
-
-    //init {
-    //    viewModelScope.launch {
-    //        sendIntent(Intent.Init)
-    //    }
-    //}
+    //var state: State = State.Loading
+    private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
+    val state: StateFlow<State> = _state
 
     suspend fun sendIntent(intent: Intent) {
         when(intent) {
@@ -51,18 +46,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 val res = getTask(null)
                 when(res) {
-                    UseCaseResult.Loading -> state = State.Loading//_state.emit(State.Loading)
-                    is UseCaseResult.Error -> state = State.Error(res.exception)//_state.emit(State.Error(res.exception))
+                    UseCaseResult.Loading -> _state.emit(State.Loading)//state = State.Loading//
+                    is UseCaseResult.Error -> _state.emit(State.Error(res.exception))//state = State.Error(res.exception)//
                     is UseCaseResult.Success -> {
                         //res.data.collect {
                         //    _state.emit(State.Data(it))
                         //}
-                        //_state.emit(State.Data(res.data))
-                        state = State.Data(res.data)
+                        _state.emit(State.Data(res.data))
+                        //state = State.Data(res.data)
                     }
                 }
                 //_state.emit(res)
-                Log.e(TAG, "sendIntent-1---------------------------res $res ")
+                Log.e(TAG, "sendIntent-1---------------------------res $res")
             }
             Intent.Search -> {
                 Log.e(TAG, "sendIntent---$intent--------------------------- ")

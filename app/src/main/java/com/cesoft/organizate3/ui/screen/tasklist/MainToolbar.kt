@@ -19,13 +19,7 @@ import com.cesoft.organizate3.ui.navigation.Screens
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainToolbar(viewModel: MainViewModel) {
-    val coroutineScope = rememberCoroutineScope()
-    val onSearch: () -> Unit = {
-        coroutineScope.launch {
-            viewModel.sendIntent(Intent.Search)
-        }
-    }
+fun MainToolbar(onSearch: () -> Unit) {
     return TopAppBar(
         title = {
             //TODO: desplegable con todos los tipos de listas de tareas
