@@ -8,8 +8,9 @@ import com.cesoft.organizate3.data.local.toModel
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.repo.TaskRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class Repository(applicationContext: Context): TaskRepository {
+class Repository @Inject constructor(applicationContext: Context): TaskRepository {
 
     private val db = Room.databaseBuilder(
         applicationContext,

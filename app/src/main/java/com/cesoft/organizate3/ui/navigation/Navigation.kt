@@ -12,8 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.cesoft.organizate3.ui.screen.taskdetail.TaskDetailScreen
 import com.cesoft.organizate3.ui.screen.taskedit.EditTaskScreen
+import com.cesoft.organizate3.ui.screen.taskedit.EditTaskViewModel
 import com.cesoft.organizate3.ui.screen.tasklist.State
 import com.cesoft.organizate3.ui.screen.tasklist.TasksView
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 
 @ExperimentalComposeUiApi
@@ -51,8 +53,8 @@ fun Navigator(
         composable(
             route = Screens.AddTaskScreen.route,
         ) {
-            //AddTaskScreen(navController)
-            EditTaskScreen(args = null, navController) { }
+            //EditTaskScreen(HiltViewModel<EditTaskViewModel>(), args = null, navController)
+            EditTaskScreen(navController)
         }
         composable(
             route = Screens.TaskDetailScreen.route + Screens.TaskDetailScreen.argsDef,
@@ -66,9 +68,8 @@ fun Navigator(
             route = Screens.EditTaskScreen.route + Screens.EditTaskScreen.argsDef,
             arguments = Screens.EditTaskScreen.args,
         ) {
-            EditTaskScreen(it.arguments, navController) {
-                navController.popBackStack()
-            }
+            EditTaskScreen(navController, it.arguments)
+            //{ navController.popBackStack() }
         }
     }
 }

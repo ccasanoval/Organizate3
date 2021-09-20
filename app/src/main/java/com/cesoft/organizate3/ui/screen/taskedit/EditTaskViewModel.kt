@@ -1,34 +1,45 @@
 package com.cesoft.organizate3.ui.screen.taskedit
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cesoft.organizate3.data.Repository
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
 import com.cesoft.organizate3.domain.usecase.GetTaskByIdUseCase
+import com.cesoft.organizate3.domain.usecase.GetTaskTypesUseCase
 import com.cesoft.organizate3.domain.usecase.UpdateTaskUseCase
 import com.cesoft.organizate3.ui.composables.MapState
 import com.google.android.libraries.maps.model.LatLng
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
-class EditTaskViewModel(app: Application) : AndroidViewModel(app) {
+@HiltViewModel
+class EditTaskViewModel @Inject constructor(
+    private val getTaskByIdUseCase: GetTaskByIdUseCase,
+    private val updateTask: UpdateTaskUseCase,
+    private val addTask: AddTaskUseCase,
+    private val getTaskTypes: GetTaskTypesUseCase
+) : ViewModel() {
     private var isNewTask = true
     private var task: Task? = null
 
     private val _state = MutableStateFlow<State>(State.Loading)
     val state: Flow<State> = _state
 
-    private val repo = Repository(app.applicationContext)
-    private val getTaskByIdUseCase = GetTaskByIdUseCase(repo, Dispatchers.IO)
-    private val updateTask = UpdateTaskUseCase(repo, Dispatchers.IO)
-    private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
+    //private val repo = Repository(app.applicationContext)
+    //private val getTaskByIdUseCase = GetTaskByIdUseCase(repo, Dispatchers.IO)
+    //private val updateTask = UpdateTaskUseCase(repo, Dispatchers.IO)
+    //private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
+    //@Inject lateinit var getTaskByIdUseCase: GetTaskByIdUseCase
+    //@Inject lateinit var updateTask: UpdateTaskUseCase
+    //@Inject lateinit var addTask: AddTaskUseCase
+    //@Inject lateinit var getTaskTypes: GetTaskTypesUseCase
 
 
     private val _name = MutableStateFlow("")
@@ -55,7 +66,13 @@ class EditTaskViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            _suggestion.value= repo.getTaskTypes()
+            when(val res=getTaskTypes(null)) {
+                UseCaseResult.Loading -> {}
+                is UseCaseResult.Error -> {}
+                is UseCaseResult.Success -> {
+                    _suggestion.value = res.data
+                }
+            }
         }
     }
 

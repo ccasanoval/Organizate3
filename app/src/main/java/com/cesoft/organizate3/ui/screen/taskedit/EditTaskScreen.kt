@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
@@ -46,14 +47,19 @@ import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.TASK_ID
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
 import com.google.android.libraries.maps.model.LatLng
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.Date
 
 @ExperimentalComposeUiApi
 @Composable
-fun EditTaskScreen(args: Bundle?, navController: NavHostController, popBack: () -> Unit) {
-    val viewModel: EditTaskViewModel = viewModel()
+fun EditTaskScreen(
+    navController: NavHostController,
+    args: Bundle?=null,
+    viewModel: EditTaskViewModel=hiltViewModel()//viewModel()
+) {
+    //val viewModel: EditTaskViewModel by viewModel()
     val state: State by viewModel.state.collectAsState(State.Loading)
 
     val id = args?.getInt(TASK_ID)
@@ -95,7 +101,10 @@ private fun Editing(title: String, navController: NavHostController, onSave: () 
         topBar = { TopBar(title, onSave) },
         bottomBar = { MainBottomNavigation(navController) }
     ) { innerPadding ->
-        Box(Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding())) {
             Body()
         }
     }
