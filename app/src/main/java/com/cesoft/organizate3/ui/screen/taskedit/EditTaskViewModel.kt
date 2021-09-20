@@ -1,4 +1,4 @@
-package com.cesoft.organizate3.ui.screen.taskadd
+package com.cesoft.organizate3.ui.screen.taskedit
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -7,6 +7,8 @@ import com.cesoft.organizate3.data.Repository
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
+import com.cesoft.organizate3.domain.usecase.GetTaskByIdUseCase
+import com.cesoft.organizate3.domain.usecase.UpdateTaskUseCase
 import com.cesoft.organizate3.ui.composables.MapState
 import com.google.android.libraries.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
@@ -16,13 +18,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
-class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
+class EditTaskViewModel(app: Application) : AndroidViewModel(app) {
+    private var isNewTask = true
+    private var task: Task? = null
 
-    private val _state = MutableStateFlow<State>(State.Editing)
+    private val _state = MutableStateFlow<State>(State.Loading)
     val state: Flow<State> = _state
 
     private val repo = Repository(app.applicationContext)
+    private val getTaskByIdUseCase = GetTaskByIdUseCase(repo, Dispatchers.IO)
+    private val updateTask = UpdateTaskUseCase(repo, Dispatchers.IO)
     private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
+
 
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
@@ -54,6 +61,35 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
 
     suspend fun sendIntent(intent: Intent) {
         when(intent) {
+            is Intent.Init -> {
+                intent.id?.let {
+                    when(val res = getTaskByIdUseCase(intent.id)) {
+                        UseCaseResult.Loading -> {
+                            _state.emit(State.Loading)
+                        }
+                        is UseCaseResult.Error -> {
+                            _state.emit(State.Error(isNewTask))
+                        }
+                        is UseCaseResult.Success -> {
+                            task = res.data
+                            task?.let {
+                                isNewTask = false
+                                _name.value = it.name
+                                _description.value = it.description
+                                _type.value = it.type
+                                _done.value = it.done
+                                _dueDate.value = it.dueDate
+                                _priority.value = it.priority
+                                _radius.value = it.radius
+                                _latLng.value = LatLng(it.latitude, it.longitude)
+                            }
+                            _state.emit(State.Editing(name.value))
+                        }
+                    }
+                } ?: run {
+                    _state.emit(State.Editing(null))
+                }
+            }
             is Intent.ChangeField -> {
                 when(intent.field) {
                     Field.Name -> _name.value = intent.value as String
@@ -67,16 +103,23 @@ class AddTaskViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }
             is Intent.Save -> {
-                val task = Task(0, name.value, description.value, dueDate.value, done.value, priority.value,
-                    type.value, latLng.value.latitude, latLng.value.longitude, radius.value)
-                android.util.Log.e("AddTaskView", "sendIntent---$intent--------***------ task=$task")
-                when(addTask(task)) {
+                val res = if(isNewTask) {
+                    val task = Task(0, name.value, description.value, dueDate.value, done.value, priority.value,
+                        type.value, latLng.value.latitude, latLng.value.longitude, radius.value)
+                    addTask(task)
+                }
+                else {
+                    val task = Task(task!!.id, name.value, description.value, dueDate.value, done.value, priority.value,
+                        type.value, latLng.value.latitude, latLng.value.longitude, radius.value)
+                    updateTask(task)
+                }
+                when(res) {
                     UseCaseResult.Loading -> _state.emit(State.Loading)
-                    is UseCaseResult.Error -> _state.emit(State.Error)
+                    is UseCaseResult.Error -> _state.emit(State.Error(isNewTask))
                     is UseCaseResult.Success -> _state.emit(State.Saved)
                 }
             }
-            Intent.Done -> _state.emit(State.Editing)
+            Intent.Done -> _state.emit(State.Editing(name.value))
         }
     }
 }

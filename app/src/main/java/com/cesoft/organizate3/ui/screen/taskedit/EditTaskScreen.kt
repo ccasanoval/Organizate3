@@ -1,13 +1,12 @@
-package com.cesoft.organizate3.ui.screen.taskadd
+package com.cesoft.organizate3.ui.screen.taskedit
 
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -25,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,17 +43,23 @@ import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.composables.TextFieldAutoCompo
 import com.cesoft.organizate3.ui.composables.TextFieldCompo
 import com.cesoft.organizate3.ui.navigation.Screens
+import com.cesoft.organizate3.ui.navigation.TASK_ID
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
-import kotlinx.coroutines.launch
-import java.util.Date
 import com.google.android.libraries.maps.model.LatLng
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import java.util.Date
 
 @ExperimentalComposeUiApi
 @Composable
-fun AddTaskScreen(navController: NavHostController) {
-    val viewModel: AddTaskViewModel = viewModel()
-    val state: State by viewModel.state.collectAsState(State.Editing)
+fun EditTaskScreen(args: Bundle?, navController: NavHostController, popBack: () -> Unit) {
+    val viewModel: EditTaskViewModel = viewModel()
+    val state: State by viewModel.state.collectAsState(State.Loading)
+
+    val id = args?.getInt(TASK_ID)
+    LaunchedEffect(id) {
+        viewModel.sendIntent(Intent.Init(id))
+    }
 
     val coroutineScope = rememberCoroutineScope()
     val onSave: () -> Unit = {
@@ -61,25 +67,32 @@ fun AddTaskScreen(navController: NavHostController) {
             viewModel.sendIntent(Intent.Save)
         }
     }
-android.util.Log.e("AddTaskV", "AddTaskScreen----------------- $state")
-    when(state) {
+    when(val s = state) {
         State.Loading -> Loading()
-        State.Editing -> Editing(navController, onSave)
-        State.Saved -> saved(viewModel, navController)//Saved(viewModel, navController)
-        State.Error -> Error(navController, onSave)
+        State.Saved -> saved(viewModel, navController) //Saved(viewModel, navController)
+        is State.Editing -> {
+            val title = s.taskName ?: stringResource(Screens.AddTaskScreen.label)
+            Editing(title, navController, onSave)
+        }
+        is State.Error -> {
+            val title = if(s.isNewTask)
+                stringResource(Screens.AddTaskScreen.label)
+            else
+                stringResource(R.string.error_unkown_task)
+            Error(title, navController, onSave)
+        }
     }
 }
 
-@Composable
-private fun Loading() {
+@Composable private fun Loading() {
     LoadingCompo()
 }
 
 @ExperimentalComposeUiApi
 @Composable
-private fun Editing(navController: NavHostController, onSave: () -> Unit) {
+private fun Editing(title: String, navController: NavHostController, onSave: () -> Unit) {
     Scaffold(
-        topBar = { TopBar(onSave) },
+        topBar = { TopBar(title, onSave) },
         bottomBar = { MainBottomNavigation(navController) }
     ) { innerPadding ->
         Box(Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())) {
@@ -88,8 +101,7 @@ private fun Editing(navController: NavHostController, onSave: () -> Unit) {
     }
 }
 
-@Composable
-private fun Saved(viewModel: AddTaskViewModel, navController: NavHostController) {
+@Composable private fun Saved(viewModel: EditTaskViewModel, navController: NavHostController) {
     navController.navigate(Screens.TasksScreen.route) {
         popUpTo(Screens.AddTaskScreen.route) { inclusive = true }
     }
@@ -97,7 +109,8 @@ private fun Saved(viewModel: AddTaskViewModel, navController: NavHostController)
         viewModel.sendIntent(Intent.Done)
     }
 }
-private fun saved(viewModel: AddTaskViewModel, navController: NavHostController) {
+
+private fun saved(viewModel: EditTaskViewModel, navController: NavHostController) {
     MainScope().launch {
         navController.navigate(Screens.TasksScreen.route) {
             popUpTo(Screens.AddTaskScreen.route) { inclusive = true }
@@ -106,45 +119,32 @@ private fun saved(viewModel: AddTaskViewModel, navController: NavHostController)
     }
 }
 
-@Composable
-private fun Error(navController: NavHostController, onSave: () -> Unit) {
-    Scaffold(
-        topBar = { TopBar(onSave) },
-        bottomBar = { MainBottomNavigation(navController) }
-    ) {
-        val color = androidx.compose.ui.graphics.Color.Companion.Red
+@Composable private fun Error(title: String, navController: NavHostController, onSave: () -> Unit) {
+    Scaffold(topBar = { TopBar(title, onSave) }, bottomBar = { MainBottomNavigation(navController) }) {
+        val color = Color.Red
         val text = stringResource(R.string.error_save_task)
         Text(text, color = color, fontSize = 26.sp, fontWeight = FontWeight.Bold)
     }
 }
 
-@Composable
-private fun TopBar(onSave: () -> Unit) {
-    TopAppBar(
-        title = { Text(stringResource(Screens.AddTaskScreen.label)) },
-        actions = {
-            IconButton(onSave) {
-                Icon(Icons.Filled.Save, stringResource(R.string.save))
-            }
-        },
-        navigationIcon = {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    Screens.AddTaskScreen.icon, contentDescription = null
-                )
-            }
+@Composable private fun TopBar(title: String, onSave: () -> Unit) {
+    TopAppBar(title = { Text(title) }, actions = {
+        IconButton(onSave) {
+            Icon(Icons.Filled.Save, stringResource(R.string.save))
         }
-    )
+    }, navigationIcon = {
+        Column(
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Screens.AddTaskScreen.icon, contentDescription = null
+            )
+        }
+    })
 }
 
-@ExperimentalComposeUiApi
-@Preview
-@Composable
-private fun Body() {
-    val viewModel: AddTaskViewModel = viewModel()
+@ExperimentalComposeUiApi @Preview @Composable private fun Body() {
+    val viewModel: EditTaskViewModel = viewModel()
 
     val name: String by viewModel.name.collectAsState()
     val description: String by viewModel.description.collectAsState()
@@ -155,7 +155,7 @@ private fun Body() {
     val latLng: LatLng by viewModel.latLng.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
-    val changeField : (field: Field, value: Any?) -> Unit = { field, value ->
+    val changeField: (field: Field, value: Any?) -> Unit = { field, value ->
         coroutineScope.launch {
             viewModel.sendIntent(Intent.ChangeField(field, value))
         }
@@ -163,8 +163,7 @@ private fun Body() {
     val suggestions = viewModel.suggestions.collectAsState()
 
     Column(
-        Modifier
-            //.background(Color.LightGray)
+        Modifier //.background(Color.LightGray)
             .verticalScroll(rememberScrollState())
     ) {
 
@@ -189,12 +188,10 @@ private fun Body() {
         //DatePickerCompo(dueDate, R.string.field_due_date) {
         DateFieldCompo(dueDate, R.string.field_due_date) {
             changeField(Field.DueDate, it)
-            android.util.Log.e("AddTaskScreen", "Body----------------------date=$it")
         }
 
         //TODO: Better box and priority float at end of line...
-        Row {
-            // Done
+        Row { // Done
             CheckboxCompo(done, R.string.field_done) {
                 changeField(Field.Done, it)
             }
