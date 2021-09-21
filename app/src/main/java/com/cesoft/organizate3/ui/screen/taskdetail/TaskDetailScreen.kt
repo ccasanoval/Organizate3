@@ -38,6 +38,7 @@ import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.UseCaseResult
 import com.cesoft.organizate3.domain.model.Task
+import com.cesoft.organizate3.domain.model.floatValue
 import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
 import com.cesoft.organizate3.ui.composables.MapState
@@ -251,7 +252,7 @@ private fun Body(task: Task) {
 
         // Priority
         RatingBarCompo(
-            value = task.priority.value.toFloat(),
+            value = task.priority.floatValue(),
             labelCompo = { FieldTitle(R.string.field_priority, modifier = Modifier.padding(end = 4.dp)) },
             modifier = modifierTitle
         )

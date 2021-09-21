@@ -22,5 +22,6 @@ data class Task(
             fun getByValue(value: Int) = VALUES.firstOrNull { it.value == value }
         }
     }
-
 }
+fun Task.Priority.floatValue() = value.toFloat()
+fun Task.Priority.intValue() = value.toInt()

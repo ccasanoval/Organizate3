@@ -23,19 +23,24 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.model.Task
+import com.cesoft.organizate3.domain.model.floatValue
 import com.cesoft.organizate3.ui.composables.LoadingCompo
+import com.cesoft.organizate3.ui.composables.RatingBarCompo
+import com.cesoft.organizate3.ui.dateColor
+import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.Navigator
-import com.cesoft.organizate3.ui.navigation.Screens
-import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
 import kotlinx.coroutines.launch
+import java.util.*
 
 @ExperimentalComposeUiApi
 @Composable
@@ -100,6 +105,22 @@ private fun TasksList(tasks: List<Task>, onTaskClick: (task: Task) -> Unit) {
     }
 }
 
+@Preview
+@Composable
+private fun TaskItemPreview() {
+    TaskItem(task = Task(
+        name = "Name of task",
+        description = "Description of the task",
+        dueDate = Date(),
+        done = false,
+        priority = Task.Priority.MID,
+        type = "Type of task",
+        latitude = 40.5,
+        longitude = 3.25,
+        radius = 100,
+    )){}
+}
+
 @Composable
 private fun TaskItem(
     task: Task,
@@ -116,17 +137,39 @@ private fun TaskItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-            Text(
-                taskName,
-                style = MaterialTheme.typography.h6, maxLines = 1, overflow = TextOverflow.Ellipsis
-            )
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Row {
                 Text(
-                    task.description,
-                    style = MaterialTheme.typography.body2
+                    taskName,
+                    style = MaterialTheme.typography.h6,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textDecoration = if(task.done) TextDecoration.LineThrough else TextDecoration.None
                 )
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 2.dp)
+                ) {
+                    RatingBarCompo(value = task.priority.floatValue(), labelCompo = {}, size = 14.dp)
+                    Text(
+                        text = task.dueDate.dateFormatter(),
+                        style = MaterialTheme.typography.body1,
+                        color = task.dueDate.dateColor())
+                }
+            }
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Row {
+                    Text(task.description, style = MaterialTheme.typography.body2)
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(task.type, style = MaterialTheme.typography.body2)
+                    }
+                }
             }
         }
     }
-    Divider(modifier = Modifier.padding(horizontal = 6.dp))//TODO:Dark mode color
+    Divider(modifier = Modifier.padding(horizontal = 4.dp))//TODO:Dark mode color
 }
