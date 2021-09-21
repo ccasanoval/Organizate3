@@ -38,7 +38,10 @@ import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateColor
 import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.Navigator
+import com.cesoft.organizate3.ui.navigation.Screens
+import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -52,8 +55,9 @@ fun TaskListScreen() {
 
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val bottomBar: @Composable () -> Unit =
-        { MainBottomNavigation(navController) }
+    val bottomBar: @Composable () -> Unit = {
+        MainBottomNavigation(navController)
+    }
     val topBar: @Composable () -> Unit = {
         MainToolbar {
             coroutineScope.launch {
@@ -62,12 +66,8 @@ fun TaskListScreen() {
         }
     }
 
-    //val taskView = TasksView(viewModel.state.collectAsState().value) { task ->
-    //    navController.navigate(Screens.TaskDetailScreen.withArgs(task))
-    //}
     Navigator(viewModel.state.collectAsState().value, navController, topBar, bottomBar)
 }
-
 
 @Composable
 fun TasksView(state: State, onSelectedTask: (task: Task) -> Unit) {

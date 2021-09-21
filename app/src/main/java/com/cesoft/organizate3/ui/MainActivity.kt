@@ -9,7 +9,6 @@ import com.cesoft.organizate3.ui.theme.Organizate3Theme
 import dagger.hilt.android.AndroidEntryPoint
 
 //TODO:
-// Enhance task list items
 // Order tasks by: dueDate, geolocation, priority, in the main list!
 // Get current geolocation for tasks
 // Geofencing alerts
