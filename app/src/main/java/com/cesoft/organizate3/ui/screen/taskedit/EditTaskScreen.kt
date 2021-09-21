@@ -57,9 +57,8 @@ import java.util.Date
 fun EditTaskScreen(
     navController: NavHostController,
     args: Bundle?=null,
-    viewModel: EditTaskViewModel=hiltViewModel()//viewModel()
+    viewModel: EditTaskViewModel=hiltViewModel()
 ) {
-    //val viewModel: EditTaskViewModel by viewModel()
     val state: State by viewModel.state.collectAsState(State.Loading)
 
     val id = args?.getInt(TASK_ID)

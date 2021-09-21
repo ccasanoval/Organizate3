@@ -1,23 +1,23 @@
 package com.cesoft.organizate3.ui.screen.tasklist
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.cesoft.organizate3.data.Repository
+import androidx.lifecycle.ViewModel
 import com.cesoft.organizate3.domain.UseCaseResult
-import com.cesoft.organizate3.domain.data
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
+import com.cesoft.organizate3.domain.usecase.DeleteAllTasksUseCase
 import com.cesoft.organizate3.domain.usecase.GetTasksUseCase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(app: Application) : AndroidViewModel(app) {
+@HiltViewModel
+class TaskListViewModel @Inject constructor(
+    private val getTask: GetTasksUseCase,
+    private val addTask: AddTaskUseCase,
+    private val deleteAllTasks: DeleteAllTasksUseCase
+) : ViewModel() {
 
     private val list0 = listOf(
         Task(0,"Task 0", "The #0 task", java.util.Date(), true, Task.Priority.LOW, "Lmn", 40.50, -3.42, 100),
@@ -25,10 +25,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         Task(2,"Task 2", "The #2 task", java.util.Date(), false, Task.Priority.MID, "Zyx",40.55, -3.47, 100),
         Task(3,"Task 3", "The #3 task", java.util.Date(), true, Task.Priority.LOW, "Abc",40.59, -3.40, 100)
     )
-
-    private val repo = Repository(app.applicationContext)
-    private val getTask = GetTasksUseCase(repo, Dispatchers.IO)//TODO: DI
-    private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
 
     //var state: State = State.Loading
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
@@ -38,7 +34,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         when(intent) {
             Intent.Init -> {
                 if(false) {
-                    repo.clean()
+                    //repo.clean()
+                    deleteAllTasks(null)
                     for(task in list0) {
                         addTask(task)
                     }

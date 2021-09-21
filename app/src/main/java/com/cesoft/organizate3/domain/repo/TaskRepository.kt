@@ -15,6 +15,6 @@ interface TaskRepository {
     // Delete -------------------------------------------------------------------------------------
     //suspend fun deleteTask(task: Task)
     suspend fun deleteTask(idTask: Int)
-    suspend fun clean()
+    suspend fun deleteAllTasks()
 
 }

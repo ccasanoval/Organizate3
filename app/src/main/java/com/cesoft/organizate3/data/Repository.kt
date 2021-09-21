@@ -50,15 +50,11 @@ class Repository @Inject constructor(applicationContext: Context): TaskRepositor
 
     // Delete -------------------------------------------------------------------------------------
 
-    override suspend fun clean() {
+    override suspend fun deleteAllTasks() {
         val dao = db.taskDao()
         dao.deleteAll()
     }
 
-    //override suspend fun deleteTask(task: Task) {
-    //    val dao = db.taskDao()
-    //    dao.delete(task.toDb())
-    //}
     override suspend fun deleteTask(idTask: Int) {
         val dao = db.taskDao()
         dao.delete(idTask)

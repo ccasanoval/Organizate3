@@ -33,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.UseCaseResult
@@ -46,13 +46,19 @@ import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.TASK_ID
 import com.cesoft.organizate3.ui.navigation.withArgs
+import com.cesoft.organizate3.ui.screen.taskedit.EditTaskViewModel
 import com.google.android.libraries.maps.model.LatLng
 import kotlinx.coroutines.launch
 
 @Composable
-fun TaskDetailScreen(args: Bundle?, navController: NavHostController, popBack: () -> Unit) {
+fun TaskDetailScreen(
+    args: Bundle?,
+    navController: NavHostController,
+    viewModel: TaskDetailViewModel=hiltViewModel(),
+    popBack: () -> Unit
+) {
     val id = args?.getInt(TASK_ID) ?: -1
-    val viewModel: TaskDetailViewModel = viewModel()
+    //val viewModel: TaskDetailViewModel = viewModel()
     LaunchedEffect(id) {
         viewModel.sendIntent(Intent.Init(id))
     }

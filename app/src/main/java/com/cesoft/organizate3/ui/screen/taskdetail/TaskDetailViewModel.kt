@@ -1,26 +1,22 @@
 package com.cesoft.organizate3.ui.screen.taskdetail
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.cesoft.organizate3.data.Repository
+import androidx.lifecycle.ViewModel
 import com.cesoft.organizate3.domain.UseCaseResult
-import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.DeleteTaskUseCase
 import com.cesoft.organizate3.domain.usecase.GetTaskByIdUseCase
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskDetailViewModel(app: Application) : AndroidViewModel(app) {
+@HiltViewModel
+class TaskDetailViewModel @Inject constructor(
+    private val getTaskById: GetTaskByIdUseCase,
+    private val deleteTask: DeleteTaskUseCase
+) : ViewModel() {
     val stateInit = State.Fetch(UseCaseResult.Loading)
 
     private var idTask = -1
-    private val repo = Repository(app.applicationContext)
-    private val getTask = GetTaskByIdUseCase(repo, Dispatchers.IO)
-    private val deleteTask = DeleteTaskUseCase(repo, Dispatchers.IO)
-
     private val _state = MutableStateFlow<State>(stateInit)
     val state: Flow<State> = _state
 
@@ -28,7 +24,7 @@ class TaskDetailViewModel(app: Application) : AndroidViewModel(app) {
         when(intent) {
             is Intent.Init -> {
                 idTask = intent.idTask
-                val res = getTask(idTask)//repo.getTaskById(intent.idTask)
+                val res = getTaskById(idTask)
                 _state.emit(State.Fetch(res))
             }
             Intent.Delete -> {

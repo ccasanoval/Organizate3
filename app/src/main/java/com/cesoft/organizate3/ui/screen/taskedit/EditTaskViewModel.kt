@@ -32,16 +32,6 @@ class EditTaskViewModel @Inject constructor(
     private val _state = MutableStateFlow<State>(State.Loading)
     val state: Flow<State> = _state
 
-    //private val repo = Repository(app.applicationContext)
-    //private val getTaskByIdUseCase = GetTaskByIdUseCase(repo, Dispatchers.IO)
-    //private val updateTask = UpdateTaskUseCase(repo, Dispatchers.IO)
-    //private val addTask = AddTaskUseCase(repo, Dispatchers.IO)
-    //@Inject lateinit var getTaskByIdUseCase: GetTaskByIdUseCase
-    //@Inject lateinit var updateTask: UpdateTaskUseCase
-    //@Inject lateinit var addTask: AddTaskUseCase
-    //@Inject lateinit var getTaskTypes: GetTaskTypesUseCase
-
-
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
     private val _description = MutableStateFlow("")

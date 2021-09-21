@@ -32,13 +32,15 @@ import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.navigation.Navigator
+import com.cesoft.organizate3.ui.navigation.Screens
+import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
 import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @Composable
-fun MainScreen() {
-    val viewModel: MainViewModel = viewModel()
+fun TaskListScreen() {
+    val viewModel: TaskListViewModel = viewModel()
     LaunchedEffect(true) {
         viewModel.sendIntent(Intent.Init)
     }
@@ -55,6 +57,9 @@ fun MainScreen() {
         }
     }
 
+    //val taskView = TasksView(viewModel.state.collectAsState().value) { task ->
+    //    navController.navigate(Screens.TaskDetailScreen.withArgs(task))
+    //}
     Navigator(viewModel.state.collectAsState().value, navController, topBar, bottomBar)
 }
 
@@ -84,11 +89,11 @@ fun TasksView(state: State, onSelectedTask: (task: Task) -> Unit) {
 }
 
 @Composable
-fun TasksList(tasks: List<Task>, onTaskClick: (task: Task) -> Unit) {
+private fun TasksList(tasks: List<Task>, onTaskClick: (task: Task) -> Unit) {
     val listState = rememberLazyListState()
     LazyColumn(state = listState) {
         items(tasks) { task ->
-            TasksListRowView(task) { taskClicked ->
+            TaskItem(task) { taskClicked ->
                 onTaskClick(taskClicked)
             }
         }
@@ -96,7 +101,7 @@ fun TasksList(tasks: List<Task>, onTaskClick: (task: Task) -> Unit) {
 }
 
 @Composable
-fun TasksListRowView(
+private fun TaskItem(
     task: Task,
     onClickListener: (task: Task) -> Unit
 ) {
