@@ -15,7 +15,7 @@
     <string name="field_description">Description</string>
     <string name="field_due_date">Due date</string>
     <string name="field_done">Is done?</string>
-    <string name="field_type">Type of task</string>
+    <string name="field_type">Task type</string>
     <string name="field_latitude">Latitude</string>
     <string name="field_longitude">Longitude</string>
     <string name="field_radius">Radius</string>

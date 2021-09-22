@@ -38,10 +38,7 @@ import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateColor
 import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.Navigator
-import com.cesoft.organizate3.ui.navigation.Screens
-import com.cesoft.organizate3.ui.navigation.withArgs
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -58,8 +55,12 @@ fun TaskListScreen() {
     val bottomBar: @Composable () -> Unit = {
         MainBottomNavigation(navController)
     }
+    val onTypeSelect: (String) -> Unit = {
+        android.util.Log.e("TaskListScreen", "------------- type = $it")
+    }
+    val suggestions = viewModel.suggestions.collectAsState().value
     val topBar: @Composable () -> Unit = {
-        MainToolbar {
+        MainToolbar(suggestions, onTypeSelect) {
             coroutineScope.launch {
                 viewModel.sendIntent(Intent.Search)
             }
@@ -114,7 +115,7 @@ private fun TaskItemPreview() {
         dueDate = Date(),
         done = false,
         priority = Task.Priority.MID,
-        type = "Type of task",
+        type = "Task type",
         latitude = 40.5,
         longitude = 3.25,
         radius = 100,

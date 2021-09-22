@@ -1,5 +1,7 @@
 package com.cesoft.organizate3.ui.composables
 
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,17 +45,62 @@ private fun DropDownList(
                     selectedString(it)
                 }
             ) {
-                Text(it, modifier = Modifier.wrapContentWidth()//.align(Alignment.Start)
-                )
+                Text(it, modifier = Modifier.wrapContentWidth())
             }
         }
     }
 }
 
 @Composable
-fun RadiusCompo() {
-    val list = listOf("20 m", "50 m", "100 m", "200 m", "300 m", "500 m", "1 Km", "2 Km", "3 Km", "5 Km")
+fun DropDownCompo(
+    values: List<String>,
+    modifier: Modifier = Modifier,
+    textColor: Color = MaterialTheme.colors.primary,
+    @StringRes label: Int? = null,
+    onSelect: (String) -> Unit
+) {
+    val text = remember { mutableStateOf("") }
+    val isOpen = remember { mutableStateOf(false) }
+    val openCloseOfDropDownList: (Boolean) -> Unit = {
+        isOpen.value = it
+    }
+    val userSelectedString: (String) -> Unit = {
+        text.value = it
+        onSelect(it)
+    }
+    Box(modifier = modifier) {
+        Column {
+            OutlinedTextField(
+                value = text.value,
+                onValueChange = { text.value = it },
+                label = { label?.let { Text(text = stringResource(label))} },
+                modifier = Modifier.fillMaxWidth(),
+                //colors = TextFieldDefaults.outlinedTextFieldColors()
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = textColor,
+                    focusedLabelColor = textColor,
+                    unfocusedLabelColor = textColor
+                )
+            )
+            DropDownList(
+                requestToOpen = isOpen.value,
+                list = values,
+                openCloseOfDropDownList,
+                userSelectedString
+            )
+        }
+        Spacer(
+            modifier = Modifier
+                .matchParentSize()
+                .background(Color.Transparent)
+                .padding(10.dp)
+                .clickable(onClick = { isOpen.value = true })
+        )
+    }
+}
 
+@Composable
+fun IntDropDownCompo(values: List<Int>, valuesTxt: List<String>, onSelect: (Int) -> Unit) {
     val text = remember { mutableStateOf("") }
     val isOpen = remember { mutableStateOf(false) }
     val openCloseOfDropDownList: (Boolean) -> Unit = {
@@ -64,13 +113,17 @@ fun RadiusCompo() {
         Column {
             OutlinedTextField(
                 value = text.value,
-                onValueChange = { text.value = it },
+                onValueChange = {
+                    text.value = it
+                    val i = valuesTxt.indexOf(it)
+                    onSelect(values[i])
+                },
                 label = { Text(text = stringResource(R.string.field_radius)) },
                 modifier = Modifier.fillMaxWidth()
             )
             DropDownList(
                 requestToOpen = isOpen.value,
-                list = list,
+                list = valuesTxt,
                 openCloseOfDropDownList,
                 userSelectedString
             )

@@ -37,9 +37,9 @@ import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.ui.composables.CheckboxCompo
 import com.cesoft.organizate3.ui.composables.DateFieldCompo
+import com.cesoft.organizate3.ui.composables.IntDropDownCompo
 import com.cesoft.organizate3.ui.composables.LoadingCompo
 import com.cesoft.organizate3.ui.composables.MapCompo
-import com.cesoft.organizate3.ui.composables.RadiusCompo
 import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.composables.TextFieldAutoCompo
 import com.cesoft.organizate3.ui.composables.TextFieldCompo
@@ -47,7 +47,6 @@ import com.cesoft.organizate3.ui.navigation.Screens
 import com.cesoft.organizate3.ui.navigation.TASK_ID
 import com.cesoft.organizate3.ui.screen.MainBottomNavigation
 import com.google.android.libraries.maps.model.LatLng
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -109,15 +108,15 @@ private fun Editing(title: String, navController: NavHostController, onSave: () 
     }
 }
 
-@Composable private fun Saved(viewModel: EditTaskViewModel, navController: NavHostController) {
-    navController.navigate(Screens.TasksScreen.route) {
-        popUpTo(Screens.AddTaskScreen.route) { inclusive = true }
-    }
-    LaunchedEffect(true) {
-        viewModel.sendIntent(Intent.Done)
-    }
-}
-
+//@Composable
+//private fun Saved(viewModel: EditTaskViewModel, navController: NavHostController) {
+//    navController.navigate(Screens.TasksScreen.route) {
+//        popUpTo(Screens.AddTaskScreen.route) { inclusive = true }
+//    }
+//    LaunchedEffect(true) {
+//        viewModel.sendIntent(Intent.Done)
+//    }
+//}
 private fun saved(viewModel: EditTaskViewModel, navController: NavHostController) {
     MainScope().launch {
         navController.navigate(Screens.TasksScreen.route) {
@@ -127,7 +126,8 @@ private fun saved(viewModel: EditTaskViewModel, navController: NavHostController
     }
 }
 
-@Composable private fun Error(title: String, navController: NavHostController, onSave: () -> Unit) {
+@Composable
+private fun Error(title: String, navController: NavHostController, onSave: () -> Unit) {
     Scaffold(topBar = { TopBar(title, onSave) }, bottomBar = { MainBottomNavigation(navController) }) {
         val color = Color.Red
         val text = stringResource(R.string.error_save_task)
@@ -135,7 +135,8 @@ private fun saved(viewModel: EditTaskViewModel, navController: NavHostController
     }
 }
 
-@Composable private fun TopBar(title: String, onSave: () -> Unit) {
+@Composable
+private fun TopBar(title: String, onSave: () -> Unit) {
     TopAppBar(title = { Text(title) }, actions = {
         IconButton(onSave) {
             Icon(Icons.Filled.Save, stringResource(R.string.save))
@@ -151,7 +152,9 @@ private fun saved(viewModel: EditTaskViewModel, navController: NavHostController
     })
 }
 
-@ExperimentalComposeUiApi @Preview @Composable private fun Body() {
+@ExperimentalComposeUiApi
+@Preview
+@Composable private fun Body() {
     val viewModel: EditTaskViewModel = viewModel()
 
     val name: String by viewModel.name.collectAsState()
@@ -215,7 +218,11 @@ private fun saved(viewModel: EditTaskViewModel, navController: NavHostController
         }
 
         // Radius
-        RadiusCompo()
+        val list     = listOf(    20,     50,    100,      200,     300,     500,   1000,   2000,   3000,  5000)
+        val listText = listOf("20 m", "50 m", "100 m", "200 m", "300 m", "500 m", "1 Km", "2 Km", "3 Km", "5 Km")
+        IntDropDownCompo(list, listText) {
+            changeField(Field.Radius, it)
+        }
 
         // Map
         MapCompo(latLng, viewModel.mapState) { latLng ->
