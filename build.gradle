@@ -7,9 +7,9 @@ buildscript {
         // but you appear to be using Kotlin version 1.5.30 which is not known to be compatible.
     }
     repositories {
+        maven { url 'https://developer.huawei.com/repo/' }
         google()
         mavenCentral()
-        maven { url 'https://developer.huawei.com/repo/' }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:7.0.2"
@@ -17,7 +17,9 @@ buildscript {
 
         classpath "com.google.dagger:hilt-android-gradle-plugin:2.38.1"
 
-        classpath 'com.huawei.agconnect:agcp:1.6.0.300'
+        //Mapkit dependency cannot run on classpath "com.android.tools.build:gradle:7.0.2"
+        //So you'll have to wait or go back to previous version
+        //classpath 'com.huawei.agconnect:agcp:1.6.0.300'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -27,11 +29,3 @@ buildscript {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-
-//allprojects {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        maven { url 'https://developer.huawei.com/repo/' }
-//    }
-//}
