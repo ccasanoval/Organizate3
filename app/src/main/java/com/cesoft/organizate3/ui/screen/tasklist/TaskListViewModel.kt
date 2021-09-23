@@ -7,8 +7,10 @@ import com.cesoft.organizate3.domain.model.Task
 import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
 import com.cesoft.organizate3.domain.usecase.DeleteAllTasksUseCase
 import com.cesoft.organizate3.domain.usecase.GetTaskTypesUseCase
+import com.cesoft.organizate3.domain.usecase.GetTasksByTypeUseCase
 import com.cesoft.organizate3.domain.usecase.GetTasksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -18,7 +20,8 @@ class TaskListViewModel @Inject constructor(
     private val getTasksUC: GetTasksUseCase,
     private val addTaskUC: AddTaskUseCase,
     private val deleteAllTasksUC: DeleteAllTasksUseCase,
-    private val getTaskTypesUC: GetTaskTypesUseCase
+    private val getTaskTypesUC: GetTaskTypesUseCase,
+    private val getTasksByTypeUC: GetTasksByTypeUseCase
 ) : ViewModel() {
 
     private val list0 = listOf(
@@ -32,6 +35,12 @@ class TaskListViewModel @Inject constructor(
     val state: StateFlow<State> = _state
     private val _suggestion = MutableStateFlow<List<String>>(listOf())
     val suggestions: StateFlow<List<String>> = _suggestion
+
+    //private var _type: String = ALL
+    //val type: String
+    //    get() = _type
+    var type: String = ALL
+        private set
 
     /*init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -50,13 +59,13 @@ class TaskListViewModel @Inject constructor(
             UseCaseResult.Loading -> {}
             is UseCaseResult.Error -> {}
             is UseCaseResult.Success -> {
-                _suggestion.value = res.data
+                _suggestion.value = listOf(ALL) + res.data.filter { it.isNotEmpty() }
             }
         }
     }
 
-    private suspend fun getTasks() {
-        when(val res = getTasksUC(null)) {
+    private suspend fun getTasks(res: UseCaseResult<Flow<List<Task>>>) {
+        when(res) {
             UseCaseResult.Loading -> _state.emit(State.Loading)
             is UseCaseResult.Error -> _state.emit(State.Error(res.exception))
             is UseCaseResult.Success -> _state.emit(State.Data(res.data))
@@ -76,10 +85,17 @@ class TaskListViewModel @Inject constructor(
             Intent.Init -> {
                 if(false) testInit()
                 getTaskTypes()
-                getTasks()
+                getTasks(getTasksUC(null))
             }
             Intent.Search -> {
                 //_tasks.emit(PagingData.from(list1))
+            }
+            is Intent.FilterTaskType -> {
+                type = intent.type
+                if(intent.type == ALL)
+                    getTasks(getTasksUC(null))
+                else
+                    getTasks(getTasksByTypeUC(intent.type))
             }
             //is Intent.ItemClick -> Log.e(TAG, "sendIntent---$intent--------***------ ${intent.task}")
         }
@@ -87,5 +103,6 @@ class TaskListViewModel @Inject constructor(
 
     companion object {
         private val TAG = this::class.java.simpleName
+        private const val ALL = ""//"-"
     }
 }

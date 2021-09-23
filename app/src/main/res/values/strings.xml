@@ -4,8 +4,8 @@
     <string name="tasks">Tasks</string>
     <string name="task">Task</string>
     <string name="new_task">New Task</string>
-    <string name="back">Back</string>
 
+    <string name="back">Back</string>
     <string name="search">Search</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>

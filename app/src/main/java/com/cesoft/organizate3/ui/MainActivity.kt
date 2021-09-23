@@ -9,14 +9,16 @@ import com.cesoft.organizate3.ui.theme.Organizate3Theme
 import dagger.hilt.android.AndroidEntryPoint
 
 //TODO:
+// Search by name or description
 // Order tasks by: dueDate, geolocation, priority, in the main list!
 // Get current geolocation for tasks
 // Geofencing alerts
-// Make compatible with Huawei maps also (HMS)
 // Photo for tasks
 // Dark Mode
 // Pagination?
 // Tests?
+// Enhance README.md
+// Make compatible with Huawei maps also (HMS)
 
 @AndroidEntryPoint
 @ExperimentalComposeUiApi

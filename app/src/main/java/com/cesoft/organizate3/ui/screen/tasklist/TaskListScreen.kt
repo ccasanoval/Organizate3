@@ -56,11 +56,14 @@ fun TaskListScreen() {
         MainBottomNavigation(navController)
     }
     val onTypeSelect: (String) -> Unit = {
-        android.util.Log.e("TaskListScreen", "------------- type = $it")
+        coroutineScope.launch {
+            viewModel.sendIntent(Intent.FilterTaskType(it))
+        }
     }
-    val suggestions = viewModel.suggestions.collectAsState().value
+    val taskTypeSuggestions = viewModel.suggestions.collectAsState().value
+    val taskType: String = viewModel.type
     val topBar: @Composable () -> Unit = {
-        MainToolbar(suggestions, onTypeSelect) {
+        MainToolbar(taskType, taskTypeSuggestions, onTypeSelect) {
             coroutineScope.launch {
                 viewModel.sendIntent(Intent.Search)
             }

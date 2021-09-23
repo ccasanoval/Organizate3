@@ -53,13 +53,14 @@ private fun DropDownList(
 
 @Composable
 fun DropDownCompo(
+    currentValue: String,
     values: List<String>,
     modifier: Modifier = Modifier,
     textColor: Color = MaterialTheme.colors.primary,
     @StringRes label: Int? = null,
     onSelect: (String) -> Unit
 ) {
-    val text = remember { mutableStateOf("") }
+    val text = remember { mutableStateOf(currentValue) }
     val isOpen = remember { mutableStateOf(false) }
     val openCloseOfDropDownList: (Boolean) -> Unit = {
         isOpen.value = it

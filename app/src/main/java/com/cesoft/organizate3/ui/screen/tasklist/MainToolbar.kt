@@ -24,7 +24,8 @@ import com.cesoft.organizate3.ui.navigation.Screens
 
 @Composable
 fun MainToolbar(
-    suggestions: List<String>,
+    taskType: String,
+    taskTypeSuggestions: List<String>,
     onSelect: (String) -> Unit,
     onSearch: () -> Unit
 ) {
@@ -44,14 +45,16 @@ fun MainToolbar(
                 ) {
                     Icon(Screens.TasksScreen.icon, null)
                 }
-            })
+            }
+        )
         DropDownCompo(
-            values = suggestions,
+            currentValue = taskType,
+            values = taskTypeSuggestions,
             modifier = Modifier.background(MaterialTheme.colors.primary),
             label = R.string.field_type,
             textColor = MaterialTheme.colors.surface,
-            onSelect = onSelect)
-
+            onSelect = onSelect
+        )
     }
 }
 /*
