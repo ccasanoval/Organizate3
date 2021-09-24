@@ -23,15 +23,17 @@ import com.cesoft.organizate3.ui.composables.DropDownCompo
 import com.cesoft.organizate3.ui.navigation.Screens
 
 @Composable
-fun MainToolbar(
+fun TaskListToolbar(
     taskType: String,
     taskTypeSuggestions: List<String>,
     onSelect: (String) -> Unit,
     onSearch: () -> Unit
 ) {
+    android.util.Log.e("MainToolbar", "MainToolbar: --------------------state = $taskTypeSuggestions")
+
     return Column(Modifier.fillMaxWidth().padding(0.dp)) {
         TopAppBar(
-            title = { //TODO: desplegable con todos los tipos de listas de tareas
+            title = {
                 Text(text = stringResource(Screens.TasksScreen.label))
             },
             actions = { //TODO: buscar
@@ -57,28 +59,3 @@ fun MainToolbar(
         )
     }
 }
-/*
-@Composable
-fun FilterToolbar(type: String, suggestions: List<String>, onSelect: (String) -> Unit) {
-    return TopAppBar(
-        title = {
-            //TODO: desplegable con todos los tipos de listas de tareas
-            //DropdownMenuItem()
-        },
-        actions = {
-            TextFieldAutoCompo(
-                type, R.string.field_type, suggestions
-            ) {
-                onSelect(it)
-            }
-        },
-        navigationIcon = {
-            //Column(
-            //    modifier = Modifier.fillMaxSize(),
-            //    verticalArrangement = Arrangement.Center,
-            //    horizontalAlignment = Alignment.CenterHorizontally) {
-            //    Icon(Screens.TasksScreen.icon, null)
-            //}
-        }
-    )
-}*/

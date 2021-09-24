@@ -28,8 +28,6 @@ fun Navigator(
     bottomBar: @Composable () -> Unit
 ) {
     android.util.Log.e("MainV", "Navigator --------********------------ $state")
-
-    //TODO: Mover a un archivo de navigation...
     NavHost(
         navController = navController,
         startDestination = Screens.TasksScreen.route

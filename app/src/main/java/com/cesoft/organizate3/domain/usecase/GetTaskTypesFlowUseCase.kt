@@ -5,11 +5,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetTaskTypesUseCase @Inject constructor(
+class GetTaskTypesFlowUseCase @Inject constructor(
     private val repo: TaskRepository,
     ioDispatcher: CoroutineDispatcher
-) : SuspendUseCase<Any?, List<String>>(ioDispatcher) {
-    override suspend fun execute(parameters: Any?): List<String> {
-        return repo.getTaskTypes()
+) : SuspendUseCase<Any?, Flow<List<String>>>(ioDispatcher) {
+    override suspend fun execute(parameters: Any?): Flow<List<String>> {
+        return repo.getTaskTypesFlow()
     }
 }

@@ -21,7 +21,7 @@ private fun currentRoute(navController: NavHostController): String? {
 }
 
 @Composable
-fun MainBottomNavigation(
+fun MainBottomToolbar(
     navController: NavHostController,
     items: List<Screens> = bottomNavigationItems
 ) {

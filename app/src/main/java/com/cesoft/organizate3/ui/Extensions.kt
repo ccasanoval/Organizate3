@@ -1,6 +1,11 @@
 package com.cesoft.organizate3.ui
 
 import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.toList
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,8 +29,12 @@ fun Date.dateColor() : Color {
                 Color.Red
             }
             else -> {
-                Color.Yellow
+                Color.Cyan
             }
         }
     }
 }
+
+@FlowPreview
+suspend fun <T> Flow<List<T>>.flattenToList() =
+    flatMapConcat { it.asFlow() }.toList()

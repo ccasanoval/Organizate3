@@ -8,6 +8,7 @@ interface TaskRepository {
     suspend fun getTasks(): Flow<List<Task>>
     suspend fun getTaskById(id: Int): Task?
     suspend fun getTaskTypes(): List<String>
+    suspend fun getTaskTypesFlow(): Flow<List<String>>
     suspend fun getTasksByType(type: String): Flow<List<Task>>
     // Insert -------------------------------------------------------------------------------------
     suspend fun saveTask(task: Task)

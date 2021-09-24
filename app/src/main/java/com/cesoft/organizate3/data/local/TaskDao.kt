@@ -27,6 +27,9 @@ interface TaskDao {
     @Query("SELECT DISTINCT(type) FROM tasks")
     fun getTaskTypes(): List<String>
 
+    @Query("SELECT DISTINCT(type) FROM tasks")
+    fun getTaskTypesFlow(): Flow<List<String>>
+
     @Query("SELECT * FROM tasks WHERE type LIKE :type")
     fun getTasksByTypes(type: String): Flow<List<TaskEntity>>
 

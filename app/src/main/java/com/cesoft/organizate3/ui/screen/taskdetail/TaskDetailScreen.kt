@@ -59,7 +59,6 @@ fun TaskDetailScreen(
     popBack: () -> Unit
 ) {
     val id = args?.getInt(TASK_ID) ?: -1
-    //val viewModel: TaskDetailViewModel = viewModel()
     LaunchedEffect(id) {
         viewModel.sendIntent(Intent.Init(id))
     }

@@ -15,7 +15,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -28,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.cesoft.organizate3.R
 import com.cesoft.organizate3.domain.model.Task
@@ -38,32 +37,27 @@ import com.cesoft.organizate3.ui.composables.RatingBarCompo
 import com.cesoft.organizate3.ui.dateColor
 import com.cesoft.organizate3.ui.dateFormatter
 import com.cesoft.organizate3.ui.navigation.Navigator
-import com.cesoft.organizate3.ui.screen.MainBottomNavigation
+import com.cesoft.organizate3.ui.screen.MainBottomToolbar
 import kotlinx.coroutines.launch
 import java.util.*
 
 @ExperimentalComposeUiApi
 @Composable
-fun TaskListScreen() {
-    val viewModel: TaskListViewModel = viewModel()
-    LaunchedEffect(true) {
-        viewModel.sendIntent(Intent.Init)
-    }
-
+fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
     val bottomBar: @Composable () -> Unit = {
-        MainBottomNavigation(navController)
+        MainBottomToolbar(navController)
     }
     val onTypeSelect: (String) -> Unit = {
         coroutineScope.launch {
             viewModel.sendIntent(Intent.FilterTaskType(it))
         }
     }
-    val taskTypeSuggestions = viewModel.suggestions.collectAsState().value
+    val taskTypeSuggestions = viewModel.taskTypeSuggestions.collectAsState(emptyList()).value
     val taskType: String = viewModel.type
     val topBar: @Composable () -> Unit = {
-        MainToolbar(taskType, taskTypeSuggestions, onTypeSelect) {
+        TaskListToolbar(taskType, taskTypeSuggestions, onTypeSelect) {
             coroutineScope.launch {
                 viewModel.sendIntent(Intent.Search)
             }
@@ -75,6 +69,8 @@ fun TaskListScreen() {
 
 @Composable
 fun TasksView(state: State, onSelectedTask: (task: Task) -> Unit) {
+    android.util.Log.e("MainV", "TasksView: --------------------state = $state")
+
     when(state) {
         State.Loading -> {
             android.util.Log.e("MainV", "TasksView:Loading --------------------")

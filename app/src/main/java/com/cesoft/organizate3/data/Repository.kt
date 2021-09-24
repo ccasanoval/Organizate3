@@ -34,6 +34,11 @@ class Repository @Inject constructor(applicationContext: Context): TaskRepositor
         return dao.getTaskTypes()
     }
 
+    override suspend fun getTaskTypesFlow(): Flow<List<String>> {
+        val dao = db.taskDao()
+        return dao.getTaskTypesFlow()
+    }
+
     override suspend fun getTasksByType(type: String): Flow<List<Task>> {
         val dao = db.taskDao()
         return dao.getTasksByTypes(type).toModel()

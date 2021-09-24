@@ -7,6 +7,7 @@ import com.cesoft.organizate3.domain.usecase.AddTaskUseCase
 import com.cesoft.organizate3.domain.usecase.DeleteAllTasksUseCase
 import com.cesoft.organizate3.domain.usecase.DeleteTaskUseCase
 import com.cesoft.organizate3.domain.usecase.GetTaskByIdUseCase
+import com.cesoft.organizate3.domain.usecase.GetTaskTypesFlowUseCase
 import com.cesoft.organizate3.domain.usecase.GetTaskTypesUseCase
 import com.cesoft.organizate3.domain.usecase.GetTasksByTypeUseCase
 import com.cesoft.organizate3.domain.usecase.GetTasksUseCase
@@ -50,6 +51,11 @@ object AppModule {
     @Provides
     fun providesGetTaskTypesUseCase(repository: TaskRepository): GetTaskTypesUseCase {
         return GetTaskTypesUseCase(repository, Dispatchers.IO)
+    }
+
+    @Provides
+    fun providesGetTaskTypesFlowUseCase(repository: TaskRepository): GetTaskTypesFlowUseCase {
+        return GetTaskTypesFlowUseCase(repository, Dispatchers.IO)
     }
 
     @Provides
